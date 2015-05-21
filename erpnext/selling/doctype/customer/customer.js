@@ -17,6 +17,9 @@ frappe.ui.form.on("Customer", "refresh", function(frm) {
 
 cur_frm.cscript.onload = function(doc, dt, dn) {
 	cur_frm.cscript.load_defaults(doc, dt, dn);
+	if(doc.__islocal != 1){
+		cur_frm.set_df_property("abbr", "read_only", 1);
+	}
 }
 
 cur_frm.cscript.load_defaults = function(doc, dt, dn) {

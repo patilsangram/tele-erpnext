@@ -12,3 +12,12 @@ frappe.ui.form.on("Contact", "validate", function(frm) {
 			frappe.model.remove_from_locals(doctype, name);
 	});
 });
+
+cur_frm.fields_dict['location_id'].get_query = function(doc,cdt,cdn) {
+	return {
+		query: "erpnext.utilities.doctype.address.address.get_customer_addresses",
+		filters:{
+			'customer': doc.customer
+		}
+	}
+}

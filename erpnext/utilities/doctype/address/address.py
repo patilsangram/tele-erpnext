@@ -4,23 +4,31 @@
 from __future__ import unicode_literals
 import frappe
 
-from frappe import throw, _
+from frappe import throw, _, msgprint
 from frappe.utils import cstr
 
 from frappe.model.document import Document
+from frappe.model.naming import make_autoname
 
-class Address(Document):
+class Address(Document):	
 	def autoname(self):
-		if not self.address_title:
-			self.address_title = self.customer \
-				or self.supplier or self.sales_partner or self.lead
-
-		if self.address_title:
-			self.name = cstr(self.address_title).strip() + "-" + cstr(self.address_type).strip()
+		if(self.customer):
+			abbr = frappe.db.get_value("Customer",self.customer,"abbr")
+			self.name = make_autoname(abbr + "-.####")
 		else:
-			throw(_("Address Title is mandatory."))
+			if not self.address_title:
+				self.address_title = self.customer \
+					or self.supplier or self.sales_partner or self.lead
+
+			if self.address_title:
+				self.name = cstr(self.address_title).strip() + "-" + cstr(self.address_type).strip()
+			else:
+				throw(_("Address Title is mandatory."))
 
 	def validate(self):
+		if(self.customer):
+			self.location_id = self.name
+
 		self.validate_primary_address()
 		self.validate_shipping_address()
 
@@ -49,6 +57,11 @@ class Address(Document):
 				frappe.db.sql("""update `tabAddress` set `%s`=0 where `%s`=%s and name!=%s""" %
 					(is_address_type, fieldname, "%s", "%s"), (self.get(fieldname), self.name))
 				break
+	def after_rename(self, old, new, merge=False):
+		# after rename update the series by +1
+		customer = frappe.db.get_value("Address",new,"customer")
+		abbr = frappe.db.get_value("Customer",customer,"abbr") + "-" 
+		frappe.db.sql("""UPDATE tabSeries SET current=(current+1) WHERE name='%s'""" % abbr)
 
 @frappe.whitelist()
 def get_address_display(address_dict):
@@ -84,5 +97,11 @@ def get_territory_from_address(address):
 
 	return territory
 
+def get_customer_addresses(doctype, txt, searchfield, start, page_len, filters):
+	condition = ""
+	if filters.get("customer"):
+		condition = "customer='%(customer)s'"%filters
+	else:
+		condition = "customer<>''"
 
-
+	return frappe.db.sql("""select name from tabAddress where %s"""%condition)

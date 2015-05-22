@@ -290,4 +290,3 @@ def get_account_list(doctype, txt, searchfield, start, page_len, filters):
 	return frappe.desk.reportview.execute("Account", filters = filter_list,
 		fields = ["name", "parent_account"],
 		limit_start=start, limit_page_length=page_len, as_list=True)
-

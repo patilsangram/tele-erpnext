@@ -33,6 +33,15 @@ class Customer(TransactionBase):
 	def validate(self):
 		self.validate_values()
 
+		# check if abbriviation is already taken
+		self.is_duplicate_abbr()
+
+	def is_duplicate_abbr(self):
+		# if abbr is duplicate then raise the error
+		abbr_list = frappe.db.sql("""SELECT abbr FROM tabCustomer""", as_list = 1)
+		if frappe.db.sql("""SELECT abbr FROM tabCustomer WHERE abbr = "%s" and name <> "%s" """%(self.abbr,self.name), debug=1):
+			frappe.throw(_("Abbriviation {0} is already taken").format(self.abbr))
+
 	def update_lead_status(self):
 		if self.lead_name:
 			frappe.db.sql("update `tabLead` set status='Converted' where name = %s", self.lead_name)

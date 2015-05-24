@@ -114,6 +114,11 @@ class AccountsController(TransactionBase):
 			for fieldname in self.meta.get_valid_columns():
 				parent_dict[fieldname] = self.get(fieldname)
 
+			# [TA]
+			if self.doctype == "Quotation":
+				parent_dict.update({"document_type":"Quotation Item"})
+			# [TA]
+
 			for item in self.get("items"):
 				if item.get("item_code"):
 					args = parent_dict.copy()
@@ -138,6 +143,7 @@ class AccountsController(TransactionBase):
 					if ret.get("pricing_rule"):
 						for field in ["base_price_list_rate", "price_list_rate",
 							"discount_percentage", "base_rate", "rate"]:
+								# frappe.errprint(ret.get(field))
 								item.set(field, ret.get(field))
 
 	def set_taxes(self):

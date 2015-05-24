@@ -35,19 +35,33 @@ is_customer = function(doc){
 		doc.lead = null;
 		doc.lead_name = null;
 		doc.sales_partner = null;*/
-
-		this.cur_frm.set_df_property("location_id", "read_only", 1);
 		
-		hide_field(flds);
-		unhide_field(["location_id","customer_name"]);
+		// hide_field(flds);
+		// unhide_field(["location_id","customer_name"]);
+
+		make_fields_readonly(true);
+		cur_frm.refresh_fields();
 	}
 	else{
 		// unhide fields and set customer and customer name to null
-		doc.customer = null;
-		doc.customer_name = null;
-		doc.location_id = null;
+		doc.customer = "";
+		doc.customer_name = "";
+		doc.location_id = "";
 
-		hide_field(["location_id"]);
-		unhide_field(flds);
+		// hide_field(["location_id"]);
+		// unhide_field(flds);
+
+		make_fields_readonly(false);
+		cur_frm.refresh_fields();
 	}
+}
+
+make_fields_readonly = function(is_readonly){
+	read_only = 0
+	
+	is_readonly? read_only=1 : read_only=0
+
+	cur_frm.set_df_property("supplier", "read_only", read_only);
+	cur_frm.set_df_property("lead", "read_only", read_only);
+	cur_frm.set_df_property("sales_partner", "read_only", read_only);
 }

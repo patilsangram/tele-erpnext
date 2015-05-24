@@ -136,7 +136,8 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 							doctype: item.doctype,
 							name: item.name,
 							project_name: item.project_name || me.frm.doc.project_name,
-							qty: item.qty
+							qty: item.qty,
+							document_type:cdt
 						}
 					},
 
@@ -316,6 +317,26 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 
 	qty: function(doc, cdt, cdn) {
 		this.apply_pricing_rule(frappe.get_doc(cdt, cdn), true);
+		// <TA>
+		if(cdt == "Quotation Item"){
+			// refresh total markup amount
+			// check if princing rule is present or not
+			cur_frm.refresh_field("pricing_rule");
+			item = locals[cdt][cdn]
+			
+			if(!item.pricing_rule){
+				item.type = "";
+				item.rate_or_amount = 0.0;
+				item.total_markup = 0.0;
+				item.rate = item.price_list_rate;
+			}
+			else{
+				// get markup details
+				
+			}
+			cur_frm.refresh_fields();
+		}
+		// </TA>
 	},
 
 	set_dynamic_labels: function() {

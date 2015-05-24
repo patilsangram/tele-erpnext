@@ -57,11 +57,31 @@ class Address(Document):
 				frappe.db.sql("""update `tabAddress` set `%s`=0 where `%s`=%s and name!=%s""" %
 					(is_address_type, fieldname, "%s", "%s"), (self.get(fieldname), self.name))
 				break
+	
+	def before_rename(self, old, new, merge=False):
+		"""
+			validation before rename
+			1: check if new abbr is correct
+			2: check if series is correct
+			3: check if we need to update series in backend
+		"""
+		pass
+
 	def after_rename(self, old, new, merge=False):
 		# after rename update the series by +1
-		customer = frappe.db.get_value("Address",new,"customer")
-		abbr = frappe.db.get_value("Customer",customer,"abbr") + "-" 
-		frappe.db.sql("""UPDATE tabSeries SET current=(current+1) WHERE name='%s'""" % abbr)
+		abbr =  frappe.db.sql("""SELECT CONCAT(abbr,'-') as abbr FROM tabCustomer cust, tabAddress addr 
+								WHERE cust.name=addr.customer AND addr.name = '%s'""" % new, as_dict=True, debug=True)
+
+		if self.validate_new_name(new, abbr):
+			frappe.db.sql("""UPDATE tabSeries SET current=(current+1) WHERE name='%s'""" % abbr)
+
+	def validate_new_name(self,new, abbr):
+		db_current = frappe.db.get_value("Series",abbr[0].get('abbr'), "current")
+		new_current = int(new.split('-')[1])
+		if db_current == new_current: 
+			return true
+		else:
+			frappe.throw("The series for new name should be %s" %(db_current+1))
 
 @frappe.whitelist()
 def get_address_display(address_dict):

@@ -155,7 +155,7 @@ def get_pricing_rule_for_item(args):
 			})
 		else:
 			item_details.discount_percentage = pricing_rule.discount_percentage
-
+	
 	return item_details
 
 def get_pricing_rules(args):

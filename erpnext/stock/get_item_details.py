@@ -127,7 +127,7 @@ def calculate_total_markup(markup_type,rate_or_amount,price_list_rate):
 		})
 
 	if markup_type == "Amount":
-		data["markup_amt"] = record.get("rate")
+		data["markup_amt"] = rate_or_amount
 	else:
 		data["markup_amt"] = price_list_rate * ( rate_or_amount / 100 )
 
@@ -456,7 +456,7 @@ def apply_price_list_on_item(args):
 	item_details = frappe._dict()
 	item_doc = frappe.get_doc("Item", args.item_code)
 	get_price_list_rate(args, item_doc, item_details)
-	item_details.discount_percentage = 0.0
+	item_details.discount_percentage	 = 0.0
 	item_details.update(get_pricing_rule_for_item(args))
 	return item_details
 

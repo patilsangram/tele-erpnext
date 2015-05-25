@@ -114,7 +114,7 @@ def apply_pricing_rule(args):
 		args_copy = copy.deepcopy(args)
 		args_copy.update(item)
 		out.append(get_pricing_rule_for_item(args_copy))
-
+		
 	return out
 
 def get_pricing_rule_for_item(args):
@@ -147,6 +147,7 @@ def get_pricing_rule_for_item(args):
 
 	if pricing_rule:
 		item_details.pricing_rule = pricing_rule.name
+
 		if pricing_rule.price_or_discount == "Price":
 			item_details.update({
 				"price_list_rate": pricing_rule.price/flt(args.conversion_rate) \
@@ -155,7 +156,34 @@ def get_pricing_rule_for_item(args):
 			})
 		else:
 			item_details.discount_percentage = pricing_rule.discount_percentage
-	
+		# TA
+			# get price_list_rate from price_list if pricing_rule.price_or_discount == "percentage":
+			price_list_rate = frappe.db.get_value("Item Price",{"price_list": args.price_list, "item_code": args.item_code}, "price_list_rate")
+			item_details.update({"price_list_rate":price_list_rate})
+		
+		if args.doctype == "Quotation Item":
+			# Fetch the markup details when pricing rule applied
+			from erpnext.stock.get_item_details import set_markup_fields,discount_on_total_markup,get_price_list_rate_for
+			from erpnext.stock.get_item_details import calculate_total_markup
+
+			if not args.rate_or_amount:
+				markup_details = set_markup_fields(pricing_rule.name, item_details.price_list_rate)
+			else:
+				markup_details = calculate_total_markup(args.type, float(args.rate_or_amount), item_details.price_list_rate)
+
+			item_details.update(markup_details)
+			item_details.update({
+				"rate":discount_on_total_markup(markup_details.total_markup, item_details.discount_percentage)
+				})
+
+	elif args.doctype == "Quotation Item":
+		# if price rule is not applied then reset the type, rate_or_amount, total_markup fields
+		item_details.update({
+			"type":"Percentage",
+			"rate_or_amount":0.0,
+			"total_markup":0.0
+			})
+	# /TA
 	return item_details
 
 def get_pricing_rules(args):

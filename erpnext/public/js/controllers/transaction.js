@@ -511,7 +511,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 					"item_code": d.item_code,
 					"item_group": d.item_group,
 					"brand": d.brand,
-					"qty": d.qty,
+					"qty": d.qty
 				});
 
 				if (d.doctype == "Quotation Item"){

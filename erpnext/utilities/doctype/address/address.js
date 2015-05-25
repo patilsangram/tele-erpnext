@@ -24,21 +24,6 @@ is_customer = function(doc){
 	// If customer the hide fields
 	flds = ["supplier","supplier_name","lead","lead_name","sales_partner","address_title"];
 	if(doc.customer){
-		// address title fields to readonly
-		// hide and set other fields to null
-
-		/*var refdoc = frappe.get_doc("Customer", doc.customer);
-		cur_frm.set_value('customer_name', refdoc.customer_name);*/
-
-		/*doc.supplier = null;
-		doc.supplier_name = null;
-		doc.lead = null;
-		doc.lead_name = null;
-		doc.sales_partner = null;*/
-		
-		// hide_field(flds);
-		// unhide_field(["location_id","customer_name"]);
-
 		make_fields_readonly(true);
 		cur_frm.refresh_fields();
 	}
@@ -47,9 +32,6 @@ is_customer = function(doc){
 		doc.customer = "";
 		doc.customer_name = "";
 		doc.location_id = "";
-
-		// hide_field(["location_id"]);
-		// unhide_field(flds);
 
 		make_fields_readonly(false);
 		cur_frm.refresh_fields();

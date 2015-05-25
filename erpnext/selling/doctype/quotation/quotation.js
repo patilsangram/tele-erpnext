@@ -181,7 +181,6 @@ calculate_revised_markup_and_rate = function(item){
 	else
 		item.total_markup = item.price_list_rate + item.rate_or_amount;
 
-	// if(item.discount_percentage)
 	item.rate = item.total_markup - item.total_markup * ( item.discount_percentage / 100 );
 
 	item.amount = item.qty * item.rate

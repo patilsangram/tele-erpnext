@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 import frappe
-from frappe.model.naming import make_autoname
+from frappe.model.naming import make_autoname, getseries
 from frappe import _, msgprint, throw
 import frappe.defaults
 from frappe.utils import flt
@@ -115,12 +115,26 @@ class Customer(TransactionBase):
 			frappe.db.set(self, "customer_name", newdn)
 			self.update_contact()
 			set_field = ", customer_name=%(newdn)s"
-		self.update_customer_address(newdn, set_field)
+			abbr = frappe.db.get_value("Customer",newdn,"abbr") + "-"
+		self.update_customer_address(newdn, set_field, abbr)
 
-	def update_customer_address(self, newdn, set_field):
-		frappe.db.sql("""update `tabAddress` set address_title=%(newdn)s
-			{set_field} where customer=%(newdn)s"""\
-			.format(set_field=set_field), ({"newdn": newdn}))
+	def update_customer_address(self, newdn, set_field,abbr):
+		# ERPNext
+		# frappe.db.sql("""update `tabAddress` set address_title=%(newdn)s
+		# 	{set_field} where customer=%(newdn)s"""\
+		# 	.format(set_field=set_field), ({"newdn": newdn}))
+		"""
+			rename all the addresses
+		"""
+		# get all the addresses which needs to be rename
+		condn = abbr + "%"
+		addresses = frappe.db.sql("""SELECT name FROM tabAddress addr WHERE customer='%s' AND name NOT LIKE '%s' ORDER BY name ASC"""%(newdn, condn))
+
+		for address in addresses:
+			# rename the address
+			current_series = abbr + getseries(abbr, 4, '')
+			frappe.db.sql("""update `tabAddress` set location_id=%(current_series)s, name=%(current_series)s
+				{set_field} where name=%(address)s""".format(set_field=set_field), ({"newdn": newdn, "current_series": current_series, "address":address}))
 
 @frappe.whitelist()
 def get_dashboard_info(customer):

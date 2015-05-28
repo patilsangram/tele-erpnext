@@ -166,10 +166,7 @@ def get_pricing_rule_for_item(args):
 			from erpnext.stock.get_item_details import set_markup_fields,discount_on_total_markup,get_price_list_rate_for
 			from erpnext.stock.get_item_details import calculate_total_markup
 
-			if not args.rate_or_amount:
-				markup_details = set_markup_fields(pricing_rule.name, item_details.price_list_rate)
-			else:
-				markup_details = calculate_total_markup(args.type, float(args.rate_or_amount), item_details.price_list_rate)
+			markup_details = set_markup_fields(pricing_rule.name, item_details.price_list_rate)
 
 			item_details.update(markup_details)
 			item_details.update({

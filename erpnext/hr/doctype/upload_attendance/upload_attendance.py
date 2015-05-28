@@ -178,7 +178,7 @@ def upload():
 			if row[1] and row[3]:
 				check_record(d)
 
-				att_id = import_doc(d, "Attendance", 1, row_idx, submit=True)
+				att_id = import_doc(d, "Attendance", 1, row_idx, submit=False)
 				ret.append(att_id)
 
 				task_details = []
@@ -201,8 +201,7 @@ def upload():
 	if error:
 		frappe.db.rollback()
 	else:
-		# frappe.db.commit()
-		pass
+		frappe.db.commit()
 	return {"messages": ret, "error": error}
 
 def get_child_entries(att_id, row):
@@ -215,8 +214,9 @@ def get_child_entries(att_id, row):
 		"description":row[12]
 	}
 
-def make_child_entry(att_id,record):
+def make_child_entry(att_id, idx, record):
 	att=frappe.new_doc("Attendance Time Sheet")
+	att.idx = idx + 1
 	att.task = record["task"]
 	att.description = record["description"]
 	att.in_time = record["in_time"]
@@ -235,7 +235,11 @@ def make_child_entry(att_id,record):
 def save_child_entries(child_entries):
 	for key, value in child_entries.iteritems():
 		for record in value:
-			make_child_entry(key, record)	
+			make_child_entry(key, value.index(record), record)
+
+		doc = frappe.get_doc("Attendance", key)
+		doc.validate()
+		doc.submit()
 
 def import_doc(d, doctype, overwrite, row_idx, submit=False, ignore_links=False):
 	#frappe.errprint("in import doc")

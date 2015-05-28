@@ -121,7 +121,7 @@ class Attendance(Document):
 			rec_1 = self.unicode_to_timedelta(records[i].in_time, records[i].out_time)
 
 			if rec_1["in_time"] > rec_1["out_time"]:
-				frappe.throw("In Time should be less than Out Time for record : {0}".format(record[i].idx))
+				frappe.throw("In Time should be less than Out Time for record : {0}".format(records[i].idx))
 
 			if i+1 < len(records):
 				rec_2 = self.unicode_to_timedelta(records[i+1].in_time, records[i+1].out_time)

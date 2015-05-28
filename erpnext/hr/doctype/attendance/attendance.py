@@ -48,7 +48,7 @@ class Attendance(Document):
 		self.validate_att_date()
 		self.validate_duplicate_record()
 		self.check_leave_record()
-		self.check_validate_hours()
+		self.validate_task_details()
 
 		self.working_hours = self.calculate_total_work_hours()
 		self.break_time = self.calculate_total_break_hours()
@@ -66,18 +66,10 @@ class Attendance(Document):
 		time_sheet_records = self.task_details
 
 		hours = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-		in_time = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-		out_time = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-
+		
 		for record in time_sheet_records:
-			if isinstance(record.in_time, unicode) and isinstance(record.out_time, unicode):
-				in_time = self.unicode_to_timedelta(record.in_time)
-				out_time = self.unicode_to_timedelta(record.out_time)
-			else:
-				in_time = record.in_time
-				out_time = record.out_time
-
-			hours += ( out_time - in_time )
+			rec = self.unicode_to_timedelta(record.in_time, record.out_time)
+			hours += ( rec["out_time"] - rec["in_time"] )
 
 		return hours
 
@@ -88,30 +80,51 @@ class Attendance(Document):
 		time_sheet_records = self.task_details
 		
 		break_time = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-		start_dt = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-		end_dt = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
 		
 		for i in range(0,len(time_sheet_records)):
 			if i+1 < len(time_sheet_records):
-				if isinstance(time_sheet_records[i+1].in_time, unicode) and isinstance(time_sheet_records[i].out_time, unicode):
-					start_dt = self.unicode_to_timedelta(time_sheet_records[i].out_time)
-					end_dt = self.unicode_to_timedelta(time_sheet_records[i+1].in_time)
-				else:
-					start_dt = time_sheet_records[i].out_time
-					end_dt = time_sheet_records[i+1].in_time
+				rec_1 = self.unicode_to_timedelta(time_sheet_records[i].in_time, time_sheet_records[i].out_time)
+				rec_2 = self.unicode_to_timedelta(time_sheet_records[i+1].in_time, time_sheet_records[i+1].out_time)
 
-				break_time += ( end_dt - start_dt )
+				break_time += ( rec_2["in_time"] - rec_1["out_time"] )
 				
 		return break_time
 
-	def unicode_to_timedelta(self,uni_time):
-		time = uni_time.split(":")
-		return dt.timedelta(hours = int(time[0]), minutes = int(time[1]), seconds = int(time[2]))
+	def unicode_to_timedelta(self,in_time, out_time):
+		# time = frappe._dict({
+		# 	"in_time": dt.timedelta(hours = 0, minutes = 0, seconds = 0)
+		# 	"out_time": dt.timedelta(hours = 0, minutes = 0, seconds = 0)
+		# 	})
 
-	def check_validate_hours(self):
-		# attendance = frappe.get_doc("Attendance", self.name)
-		time_sheet_records = self.task_details
+		if isinstance(in_time, unicode) and isinstance(out_time, unicode):
+			_in = in_time.split(":")
+			_out = out_time.split(":")
+			return {
+				"in_time":dt.timedelta(hours = int(_in[0]), minutes = int(_in[1]), seconds = int(_in[2])),
+				"out_time":dt.timedelta(hours = int(_out[0]), minutes = int(_out[1]), seconds = int(_out[2]))
+			}
+		else:
+			return {
+				"in_time":in_time,
+				"out_time":out_time
+			}
 
-		for record in time_sheet_records:
-			if record.in_time > record.out_time:
-				frappe.throw("In time can not be greater than out time\nPlease check the record numer : {0}".format(record.idx))
+	def validate_task_details(self):
+		"""
+			validate the in time and out time
+			1. In time can not be greater than out time_sheet_records
+			2. In time of next record must be greater than out time of previous record
+		"""
+		records = self.task_details
+
+		for i in range(0,len(records)):
+			rec_1 = self.unicode_to_timedelta(records[i].in_time, records[i].out_time)
+
+			if rec_1["in_time"] > rec_1["out_time"]:
+				frappe.throw("In Time should be less than Out Time for record : {0}".format(record[i].idx))
+
+			if i+1 < len(records):
+				rec_2 = self.unicode_to_timedelta(records[i+1].in_time, records[i+1].out_time)
+
+				if rec_2["in_time"] < rec_1["out_time"]:
+					frappe.throw("In Time of record {0} should be greater than Out Time of record {1}".format(records[i+1].idx, records[i].idx,))

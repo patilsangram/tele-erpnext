@@ -95,7 +95,10 @@ cur_frm.fields_dict['customer_address'].get_query = function(doc, cdt, cdn) {
 
 cur_frm.fields_dict['contact_person'].get_query = function(doc, cdt, cdn) {
 	return {
-		filters:{ 'customer': doc.customer }
+		filters:{ 
+			'location_id': doc.customer_address,
+			'customer': doc.customer 
+		}
 	}
 }
 

@@ -39,7 +39,7 @@ class Customer(TransactionBase):
 	def is_duplicate_abbr(self):
 		# if abbr is duplicate then raise the error
 		abbr_list = frappe.db.sql("""SELECT abbr FROM tabCustomer""", as_list = 1)
-		if frappe.db.sql("""SELECT abbr FROM tabCustomer WHERE abbr = "%s" and name <> "%s" """%(self.abbr,self.name), debug=1):
+		if frappe.db.sql("""SELECT abbr FROM tabCustomer WHERE abbr = "%s" and name <> "%s" """%(self.abbr,self.name)):
 			frappe.throw(_("Abbriviation {0} is already taken").format(self.abbr))
 
 	def update_lead_status(self):

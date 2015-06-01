@@ -78,7 +78,10 @@ def get_item_details(args):
 		out.update(data)
 
 		# calculate rate by appling discount to total_markup
-		out["rate"] = discount_on_total_markup(data.get("total_markup"), out.discount_percentage)
+		if(args.total_markup):
+			out["rate"] = discount_on_total_markup(args.total_markup, out.discount_percentage);
+		else:
+			out["rate"] = discount_on_total_markup(data.get("total_markup"), out.discount_percentage)
 	# [TA]
 
 	return out

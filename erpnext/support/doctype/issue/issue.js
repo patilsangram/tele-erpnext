@@ -52,7 +52,8 @@ cur_frm.cscript.contact = function(doc, cdt, cdn){
 set_notification_mode = function(mode){
 	$('.is-email').prop('checked', mode == 'Via Email'? true: false);
 	$('.is-sms').prop('checked', mode == 'Via SMS'? true: false);
-	$('.is-comment').prop('checked',mode != 'Via Email' && mode != 'Via SMS'?true:false);
+	$('.is-both').prop('checked', mode == 'Both'? true: false);
+	$('.is-comment').prop('checked',mode != 'Via Email' && mode != 'Via SMS' && mode != 'Both'?true:false);
 }
 
 cur_frm.fields_dict['location_id'].get_query = function(doc, cdt, cdn) {

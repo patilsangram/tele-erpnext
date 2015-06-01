@@ -131,3 +131,21 @@ cur_frm.cscript.generate_schedule = function(doc, cdt, cdn) {
 cur_frm.fields_dict.customer.get_query = function(doc,cdt,cdn) {
 	return { query: "erpnext.controllers.queries.customer_query" }
 }
+
+cur_frm.cscript.contact_person = function(doc, cdt, cdn){
+	// get notification mode and set the checkbox
+	var notification_mode = "";
+
+	frappe.model.with_doc('Contact', doc.contact_person, function() {
+  		d = frappe.model.get_doc('Contact', doc.contact_person);
+  		notification_mode = d.notification_mode;
+  		set_notification_mode(notification_mode);
+	})
+}
+
+set_notification_mode = function(mode){
+	$('.is-email').prop('checked', mode == 'Via Email'? true: false);
+	$('.is-sms').prop('checked', mode == 'Via SMS'? true: false);
+	$('.is-both').prop('checked', mode == 'Both'? true: false);
+	$('.is-comment').prop('checked',mode != 'Via Email' && mode != 'Via SMS' && mode != 'Both' ? true:false);
+}

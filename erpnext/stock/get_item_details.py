@@ -31,7 +31,7 @@ def get_item_details(args):
 			"transaction_type": "selling",
 			"ignore_pricing_rule": 0/1
 			"project_name": "",
-			"document_type"
+			"document_type":""
 		}
 	"""
 	args = process_args(args)

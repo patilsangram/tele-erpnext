@@ -60,7 +60,6 @@ set_notification_mode = function(doc){
 		frappe.model.with_doc('Contact', doc.contact, function() {
 	  		d = frappe.model.get_doc('Contact', doc.contact);
 	  		mode = d.notification_mode;
-	  		
 	  		// Set the checkbox to checked state
 	  		$('.is-email').prop('checked', mode == 'Via Email'? true: false);
 			$('.is-sms').prop('checked', mode == 'Via SMS'? true: false);

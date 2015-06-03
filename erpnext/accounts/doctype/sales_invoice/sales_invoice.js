@@ -3,6 +3,7 @@
 
 // print heading
 cur_frm.pformat.print_heading = 'Invoice';
+cur_frm.add_fetch('employee','employee_name','employee_name');
 
 {% include 'selling/sales_common.js' %};
 

@@ -4,6 +4,8 @@
 
 {% include 'selling/sales_common.js' %}
 
+cur_frm.add_fetch('employee','employee_name','employee_name');
+
 erpnext.selling.QuotationController = erpnext.selling.SellingController.extend({
 	onload: function(doc, dt, dn) {
 		var me = this;

@@ -1,3 +1,5 @@
+{% include 'support/support_common.js' %}
+
 frappe.ui.form.on("Issue", {
 	"refresh": function(frm) {
 		if(frm.doc.status==="Open") {
@@ -22,11 +24,11 @@ cur_frm.add_fetch('contact','mobile_no','phone');
 cur_frm.add_fetch('contact','email_id','raised_by');
 
 cur_frm.cscript.refresh = function(doc, cdt, cdn){
-	set_notification_mode(doc)
+	set_notification_mode(doc.contact)
 }
 
 cur_frm.cscript.onload = function(doc, cdt, cdn){
-	set_notification_mode(doc)
+	set_notification_mode(doc.contact)
 }
 
 cur_frm.cscript.customer = function(doc, cdt, cdn){
@@ -46,29 +48,7 @@ cur_frm.cscript.customer = function(doc, cdt, cdn){
 
 cur_frm.cscript.contact = function(doc, cdt, cdn){
 	// get notification mode and set the checkbox
-	
-	set_notification_mode(doc);
-}
-
-set_notification_mode = function(doc){
-	/*
-		check the notification mode from Contact and checked the respective checkbox
-	*/
-	var mode = "";
-	if(doc.contact){
-		// Get Contact doc 
-		frappe.model.with_doc('Contact', doc.contact, function() {
-	  		d = frappe.model.get_doc('Contact', doc.contact);
-	  		mode = d.notification_mode;
-	  		// Set the checkbox to checked state
-	  		$('.is-email').prop('checked', mode == 'Via Email'? true: false);
-			$('.is-sms').prop('checked', mode == 'Via SMS'? true: false);
-			$('.is-both').prop('checked', mode == 'Both'? true: false);
-			$('.is-comment').prop('checked',mode != 'Via Email' && mode != 'Via SMS' && mode != 'Both'?true:false);
-		})
-
-		cur_frm.refresh_fields();
-	}
+	set_notification_mode(doc.contact);
 }
 
 cur_frm.fields_dict['location_id'].get_query = function(doc, cdt, cdn) {

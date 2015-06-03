@@ -114,6 +114,11 @@ class AccountsController(TransactionBase):
 			for fieldname in self.meta.get_valid_columns():
 				parent_dict[fieldname] = self.get(fieldname)
 
+			# [TA]
+			if self.doctype == "Quotation":
+				parent_dict.update({"document_type":"Quotation Item"})
+			# [TA]
+
 			for item in self.get("items"):
 				if item.get("item_code"):
 					args = parent_dict.copy()
@@ -123,9 +128,9 @@ class AccountsController(TransactionBase):
 
 					if self.get("is_subcontracted"):
 						args["is_subcontracted"] = self.is_subcontracted
-
+					
 					ret = get_item_details(args)
-
+					
 					for fieldname, value in ret.items():
 						if item.meta.get_field(fieldname) and \
 							item.get(fieldname) is None and value is not None:

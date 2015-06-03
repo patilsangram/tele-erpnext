@@ -31,6 +31,7 @@ def get_item_details(args):
 			"transaction_type": "selling",
 			"ignore_pricing_rule": 0/1
 			"project_name": "",
+			"document_type":""
 		}
 	"""
 	args = process_args(args)
@@ -71,7 +72,81 @@ def get_item_details(args):
 	if args.get("is_subcontracted") == "Yes":
 		out.bom = get_default_bom(args.item_code)
 
+	# [TA]
+	if(args.document_type == "Quotation Item"):
+		data = set_markup_fields(out.pricing_rule, out.price_list_rate)
+		out.update(data)
+
+		# calculate rate by appling discount to total_markup
+		if(args.total_markup):
+			out["rate"] = discount_on_total_markup(args.total_markup, out.discount_percentage);
+		else:
+			out["rate"] = discount_on_total_markup(data.get("total_markup"), out.discount_percentage)
+	# [TA]
+
 	return out
+
+# [TA]
+
+def set_markup_fields(pricing_rule=None, price_list_rate=None):
+	"""
+		Todo: get the values of Markup (type and rate)
+		calculate the the Markup Amount, discount etc
+	"""
+	# markup_details dict will hold the all data variable regrading markup
+	markup_details = frappe._dict({})
+	if pricing_rule and price_list_rate:
+		markup_details.update(get_markup_details(pricing_rule))
+		markup_details.update(calculate_total_markup(markup_details.get("type"),markup_details.get("rate_or_amount"), price_list_rate))
+
+	return markup_details
+
+def get_markup_details(pricing_rule):
+	"""
+		get the markup details from pricing_rule
+	"""
+	markup_details = frappe._dict({
+			"type":"Percentage",
+			"rate_or_amount":0.0,
+		})
+
+	records = frappe.db.sql("""SELECT type, rate FROM `tabPricing Rule` WHERE name = '%s'""" % pricing_rule, as_dict = 1)
+	
+	for record in records:
+		markup_details["type"] = record.get("type")
+		markup_details["rate_or_amount"] = record.get("rate")
+
+	return markup_details
+
+def calculate_total_markup(markup_type,rate_or_amount,price_list_rate):
+	"""
+		calculate markup amount as follows
+		if type is percentage then calculate percentage of price_list_rate
+	"""
+
+	data = frappe._dict({
+			"total_markup":0.0,
+			"markup_amt":0.0,
+		})
+
+	if markup_type == "Amount":
+		data["markup_amt"] = rate_or_amount
+	else:
+		data["markup_amt"] = price_list_rate * ( rate_or_amount / 100 )
+
+	data["total_markup"] = price_list_rate + data["markup_amt"] 
+
+	return data
+
+def discount_on_total_markup(total_markup, discount):
+	"""
+		calculate the rate by appling discount on total_markup if any
+	"""
+	if discount:
+		total_markup = total_markup - (total_markup * (discount / 100))
+	return total_markup
+
+# [TA]
 
 def process_args(args):
 	if isinstance(args, basestring):

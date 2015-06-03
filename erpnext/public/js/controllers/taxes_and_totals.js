@@ -72,7 +72,7 @@ erpnext.taxes_and_totals = erpnext.stock.StockController.extend({
 				item.amount = flt(item.rate * item.qty, precision("amount", item));
 				item.net_amount = item.amount;
 				item.item_tax_amount = 0.0;
-
+				
 				me.set_in_company_currency(item, ["price_list_rate", "rate", "amount", "net_rate", "net_amount"]);
 			});
 		}

@@ -8,6 +8,7 @@ from frappe.utils import getdate, nowdate
 from frappe import _
 from frappe.model.document import Document
 from erpnext.hr.utils import set_employee_name
+import datetime as dt
 
 class Attendance(Document):
 	def validate_duplicate_record(self):
@@ -47,9 +48,83 @@ class Attendance(Document):
 		self.validate_att_date()
 		self.validate_duplicate_record()
 		self.check_leave_record()
+		self.validate_task_details()
+
+		self.working_hours = self.calculate_total_work_hours()
+		self.break_time = self.calculate_total_break_hours()
 
 	def on_update(self):
 		# this is done because sometimes user entered wrong employee name
 		# while uploading employee attendance
 		employee_name = frappe.db.get_value("Employee", self.employee, "employee_name")
 		frappe.db.set(self, 'employee_name', employee_name)
+
+	def calculate_total_work_hours(self):
+		"""
+			calculate the total working time in Hours
+		"""
+		time_sheet_records = self.task_details
+
+		hours = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
+		
+		for record in time_sheet_records:
+			rec = self.unicode_to_timedelta(record.in_time, record.out_time)
+			hours += ( rec["out_time"] - rec["in_time"] )
+
+		return hours
+
+	def calculate_total_break_hours(self):
+		"""
+			calculate the total break time in Hours
+		"""
+		time_sheet_records = self.task_details
+		
+		break_time = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
+		
+		for i in range(0,len(time_sheet_records)):
+			if i+1 < len(time_sheet_records):
+				rec_1 = self.unicode_to_timedelta(time_sheet_records[i].in_time, time_sheet_records[i].out_time)
+				rec_2 = self.unicode_to_timedelta(time_sheet_records[i+1].in_time, time_sheet_records[i+1].out_time)
+
+				break_time += ( rec_2["in_time"] - rec_1["out_time"] )
+				
+		return break_time
+
+	def unicode_to_timedelta(self,in_time, out_time):
+		# time = frappe._dict({
+		# 	"in_time": dt.timedelta(hours = 0, minutes = 0, seconds = 0)
+		# 	"out_time": dt.timedelta(hours = 0, minutes = 0, seconds = 0)
+		# 	})
+
+		if isinstance(in_time, unicode) and isinstance(out_time, unicode):
+			_in = in_time.split(":")
+			_out = out_time.split(":")
+			return {
+				"in_time":dt.timedelta(hours = int(_in[0]), minutes = int(_in[1]), seconds = int(_in[2])),
+				"out_time":dt.timedelta(hours = int(_out[0]), minutes = int(_out[1]), seconds = int(_out[2]))
+			}
+		else:
+			return {
+				"in_time":in_time,
+				"out_time":out_time
+			}
+
+	def validate_task_details(self):
+		"""
+			validate the in time and out time
+			1. In time can not be greater than out time_sheet_records
+			2. In time of next record must be greater than out time of previous record
+		"""
+		records = self.task_details
+
+		for i in range(0,len(records)):
+			rec_1 = self.unicode_to_timedelta(records[i].in_time, records[i].out_time)
+
+			if rec_1["in_time"] > rec_1["out_time"]:
+				frappe.throw("In Time should be less than Out Time for record : {0}".format(records[i].idx))
+
+			if i+1 < len(records):
+				rec_2 = self.unicode_to_timedelta(records[i+1].in_time, records[i+1].out_time)
+
+				if rec_2["in_time"] < rec_1["out_time"]:
+					frappe.throw("In Time of record {0} should be greater than Out Time of record {1}".format(records[i+1].idx, records[i].idx,))

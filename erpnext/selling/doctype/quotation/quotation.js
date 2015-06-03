@@ -12,7 +12,6 @@ erpnext.selling.QuotationController = erpnext.selling.SellingController.extend({
 			doc.quotation_to = "Customer";
 		else if(doc.lead && !doc.quotation_to)
 			doc.quotation_to = "Lead";
-
 	},
 	refresh: function(doc, dt, dn) {
 		this._super(doc, dt, dn);
@@ -106,6 +105,7 @@ erpnext.selling.QuotationController = erpnext.selling.SellingController.extend({
 			}
 		})
 	}
+
 });
 
 cur_frm.script_manager.make(erpnext.selling.QuotationController);
@@ -161,3 +161,29 @@ cur_frm.cscript.on_submit = function(doc, cdt, cdn) {
 frappe.ui.form.on("Quotation Item", "items_on_form_rendered", function(frm, cdt, cdn) {
 	// enable tax_amount field if Actual
 })
+
+cur_frm.cscript.rate_or_amount = function(doc, cdt, cdn) {
+	// this.apply_pricing_rule(frappe.get_doc(cdt, cdn), true);
+	item = locals[cdt][cdn];
+	calculate_revised_markup_and_rate(item)
+}
+
+cur_frm.cscript.type = function(doc, cdt, cdn){
+	// this.apply_pricing_rule(frappe.get_doc(cdt, cdn), true);
+	item = locals[cdt][cdn];
+	calculate_revised_markup_and_rate(item)	
+}
+
+calculate_revised_markup_and_rate = function(item){
+	// calculate rate
+	if(item.type == "Percentage")
+		item.total_markup = item.price_list_rate + item.price_list_rate * ( item.rate_or_amount / 100);
+	else
+		item.total_markup = item.price_list_rate + item.rate_or_amount;
+
+	item.rate = item.total_markup - item.total_markup * ( item.discount_percentage / 100 );
+
+	item.amount = item.qty * item.rate
+
+	cur_frm.refresh_fields();
+}

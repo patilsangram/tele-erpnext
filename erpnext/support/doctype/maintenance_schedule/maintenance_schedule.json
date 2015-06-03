@@ -7,7 +7,7 @@
   {
    "fieldname": "customer_details", 
    "fieldtype": "Section Break", 
-   "label": "", 
+   "label": "Search Criteria", 
    "oldfieldtype": "Section Break", 
    "options": "icon-user", 
    "permlevel": 0
@@ -228,7 +228,7 @@
  "icon": "icon-calendar", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-02-20 05:04:06.871850", 
+ "modified": "2015-06-02 03:27:30.003836", 
  "modified_by": "Administrator", 
  "module": "Support", 
  "name": "Maintenance Schedule", 

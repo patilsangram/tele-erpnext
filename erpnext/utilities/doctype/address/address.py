@@ -57,11 +57,14 @@ class Address(Document):
 				frappe.db.sql("""update `tabAddress` set `%s`=0 where `%s`=%s and name!=%s""" %
 					(is_address_type, fieldname, "%s", "%s"), (self.get(fieldname), self.name))
 				break
-	def after_rename(self, old, new, merge=False):
-		# after rename update the series by +1
-		customer = frappe.db.get_value("Address",new,"customer")
-		abbr = frappe.db.get_value("Customer",customer,"abbr") + "-" 
-		frappe.db.sql("""UPDATE tabSeries SET current=(current+1) WHERE name='%s'""" % abbr)
+
+	def validate_new_name(self,new, abbr):
+		db_current = frappe.db.get_value("Series",abbr[0].get('abbr'), "current")
+		new_current = int(new.split('-')[1])
+		if db_current == new_current: 
+			return true
+		else:
+			frappe.throw("The series for new name should be %s" %(db_current+1))
 
 @frappe.whitelist()
 def get_address_display(address_dict):

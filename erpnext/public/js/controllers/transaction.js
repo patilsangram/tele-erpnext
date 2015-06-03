@@ -136,7 +136,8 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 							doctype: item.doctype,
 							name: item.name,
 							project_name: item.project_name || me.frm.doc.project_name,
-							qty: item.qty
+							qty: item.qty,
+							document_type:cdt
 						}
 					},
 
@@ -316,6 +317,7 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 
 	qty: function(doc, cdt, cdn) {
 		this.apply_pricing_rule(frappe.get_doc(cdt, cdn), true);
+		cur_frm.refresh_field("discount_percentage");
 	},
 
 	set_dynamic_labels: function() {
@@ -511,6 +513,11 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 					"brand": d.brand,
 					"qty": d.qty
 				});
+
+				if (d.doctype == "Quotation Item"){
+					item_list[0]["type"] = d.type
+					item_list[0]["rate_or_amount"] = d.rate_or_amount
+				}
 			}
 		};
 
@@ -733,8 +740,15 @@ frappe.ui.form.on(cur_frm.doctype + " Item", "rate", function(frm, cdt, cdn) {
 	var item = frappe.get_doc(cdt, cdn);
 	frappe.model.round_floats_in(item, ["rate", "price_list_rate"]);
 
+	// correction in discount if doctype is Quotation Item
+	consider_price_list_rate = 0.0
+	if(cdt == "Quotation Item")
+		consider_price_list_rate = item.total_markup
+	else
+		consider_price_list_rate = item.price_list_rate
+
 	if(item.price_list_rate) {
-		item.discount_percentage = flt((1 - item.rate / item.price_list_rate) * 100.0, precision("discount_percentage", item));
+		item.discount_percentage = flt((1 - item.rate / consider_price_list_rate) * 100.0, precision("discount_percentage", item));
 	} else {
 		item.discount_percentage = 0.0;
 	}

@@ -21,9 +21,9 @@ class Issue(Document):
 		self.set_lead_contact(self.raised_by)
 
 		# set contact name if not set
-		if self.contact != "" and not self.contact_name:
-			d = frappe.get_doc("Contact", self.contact)
-			self.contact_name = d.first_name + " " + d.last_name
+		# if self.contact != "" and not self.contact_name:
+		# 	d = frappe.get_doc("Contact", self.contact)
+		# 	self.contact_name = d.first_name + " " + d.last_name
 
 		if self.status == "Closed":
 			from frappe.desk.form.assign_to import clear

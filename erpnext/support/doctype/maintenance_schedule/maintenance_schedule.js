@@ -1,6 +1,6 @@
 // Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
-
+{% include 'support/support_common.js' %}
 frappe.provide("erpnext.support");
 
 frappe.ui.form.on_change("Maintenance Schedule", "customer", function(frm) {
@@ -39,7 +39,7 @@ erpnext.support.MaintenanceSchedule = frappe.ui.form.Controller.extend({
 			}, frappe.boot.doctype_icons["Maintenance Visit"]);
 		}
 
-		set_notification_mode(cur_frm.doc);
+		set_notification_mode(cur_frm.doc.contact_person);
 	},
 
 	start_date: function(doc, cdt, cdn) {
@@ -87,7 +87,7 @@ cur_frm.cscript.onload = function(doc, dt, dn) {
   if(doc.__islocal){
     set_multiple(dt,dn,{transaction_date:get_today()});
   }
-  set_notification_mode(doc);
+  set_notification_mode(doc.contact_person);
 }
 
 cur_frm.fields_dict['customer_address'].get_query = function(doc, cdt, cdn) {
@@ -137,27 +137,5 @@ cur_frm.fields_dict.customer.get_query = function(doc,cdt,cdn) {
 
 cur_frm.cscript.contact_person = function(doc, cdt, cdn){
 	// get notification mode and set the checkbox
-	set_notification_mode(doc);
-}
-
-set_notification_mode = function(doc){
-	/*
-		check the notification mode from Contact and checked the respective checkbox
-	*/
-	var mode = "";
-	if(doc.contact_person){
-		// Get Contact doc 
-		frappe.model.with_doc('Contact', doc.contact_person, function() {
-	  		d = frappe.model.get_doc('Contact', doc.contact_person);
-	  		mode = d.notification_mode;
-	  		
-	  		// Set the checkbox to checked state
-	  		$('.is-email').prop('checked', mode == 'Via Email'? true: false);
-			$('.is-sms').prop('checked', mode == 'Via SMS'? true: false);
-			$('.is-both').prop('checked', mode == 'Both'? true: false);
-			$('.is-comment').prop('checked',mode != 'Via Email' && mode != 'Via SMS' && mode != 'Both'?true:false);
-		})
-
-		cur_frm.refresh_fields();
-	}
+	set_notification_mode(doc.contact_person);
 }

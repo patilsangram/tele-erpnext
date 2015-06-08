@@ -3,6 +3,8 @@
 
 {% include 'selling/sales_common.js' %}
 
+cur_frm.add_fetch('employee','employee_name','employee_name');
+
 erpnext.selling.SalesOrderController = erpnext.selling.SellingController.extend({
 	refresh: function(doc, dt, dn) {
 		this._super();
@@ -183,5 +185,3 @@ cur_frm.cscript.on_submit = function(doc, cdt, cdn) {
 		cur_frm.email_doc(frappe.boot.notification_settings.sales_order_message);
 	}
 };
-
-;

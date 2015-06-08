@@ -164,6 +164,14 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 		})
 	},
 
+	posting_date: function(){
+		// Set the Payment Due Date default is posting date + 30days
+		var due_date = new Date(this.frm.doc.posting_date);
+		due_date.setDate(due_date.getDate() + 30)
+		cur_frm.doc.due_date = (due_date.getMonth() + 1) + "-" + due_date.getDate() + "-" + due_date.getFullYear();
+		cur_frm.refresh_fields();
+	},
+
 	allocated_amount: function() {
 		this.calculate_total_advance();
 		this.frm.refresh_fields();
@@ -206,7 +214,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 
 	items_on_form_rendered: function() {
 		erpnext.setup_serial_no();
-	}
+	},
 
 });
 

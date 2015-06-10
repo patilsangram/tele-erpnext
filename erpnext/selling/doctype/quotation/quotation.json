@@ -197,6 +197,22 @@
    "search_index": 0
   }, 
   {
+   "fieldname": "employee", 
+   "fieldtype": "Link", 
+   "label": "Employee", 
+   "options": "Employee", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "employee_name", 
+   "fieldtype": "Data", 
+   "label": "Employee Name", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "currency_and_price_list", 
    "fieldtype": "Section Break", 
    "label": "", 
@@ -858,7 +874,7 @@
  "idx": 1, 
  "is_submittable": 1, 
  "max_attachments": 1, 
- "modified": "2015-06-08 20:43:21.185595", 
+ "modified": "2015-06-09 21:09:59.282618", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Quotation", 

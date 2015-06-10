@@ -172,6 +172,14 @@
    "permlevel": 0
   }, 
   {
+   "fieldname": "type", 
+   "fieldtype": "Select", 
+   "label": "Markup Type", 
+   "options": "Percentage\nAmount", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "rate", 
    "fieldtype": "Currency", 
    "in_filter": 0, 
@@ -229,6 +237,21 @@
    "fieldname": "col_break3", 
    "fieldtype": "Column Break", 
    "permlevel": 0
+  }, 
+  {
+   "fieldname": "rate_or_amount", 
+   "fieldtype": "Float", 
+   "label": "Markup Rate or Amount", 
+   "permlevel": 0, 
+   "precision": "2"
+  }, 
+  {
+   "fieldname": "total_markup", 
+   "fieldtype": "Float", 
+   "label": "Total Markup", 
+   "permlevel": 0, 
+   "precision": "2", 
+   "read_only": 1
   }, 
   {
    "fieldname": "base_rate", 
@@ -389,7 +412,7 @@
  ], 
  "idx": 1, 
  "istable": 1, 
- "modified": "2015-05-25 04:52:19.347828", 
+ "modified": "2015-06-09 21:14:05.134793", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Quotation Item", 

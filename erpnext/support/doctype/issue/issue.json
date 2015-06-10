@@ -24,6 +24,13 @@
    "search_index": 0
   }, 
   {
+   "fieldname": "issue_details", 
+   "fieldtype": "Section Break", 
+   "label": "Issue Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "subject", 
    "fieldtype": "Data", 
    "in_filter": 1, 
@@ -33,6 +40,14 @@
    "report_hide": 0, 
    "reqd": 1, 
    "search_index": 0
+  }, 
+  {
+   "fieldname": "location_id", 
+   "fieldtype": "Link", 
+   "label": "Location ID", 
+   "options": "Address", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "cb00", 
@@ -54,6 +69,21 @@
    "read_only": 0, 
    "reqd": 0, 
    "search_index": 1
+  }, 
+  {
+   "fieldname": "contact_name", 
+   "fieldtype": "Data", 
+   "label": "Contact Name", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
+   "fieldname": "phone", 
+   "fieldtype": "Data", 
+   "label": "Phone", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "depends_on": "eval:doc.__islocal", 
@@ -218,7 +248,7 @@
  ], 
  "icon": "icon-ticket", 
  "idx": 1, 
- "modified": "2015-06-02 03:26:29.432036", 
+ "modified": "2015-06-09 21:29:51.752638", 
  "modified_by": "Administrator", 
  "module": "Support", 
  "name": "Issue", 

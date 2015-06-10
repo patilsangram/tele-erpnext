@@ -157,6 +157,14 @@
    "read_only": 1
   }, 
   {
+   "fieldname": "contact_name", 
+   "fieldtype": "Data", 
+   "label": "Contact Name", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "column_break_17", 
    "fieldtype": "Column Break", 
    "permlevel": 0
@@ -228,7 +236,7 @@
  "icon": "icon-calendar", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-06-02 03:27:30.003836", 
+ "modified": "2015-06-09 21:31:28.467122", 
  "modified_by": "Administrator", 
  "module": "Support", 
  "name": "Maintenance Schedule", 

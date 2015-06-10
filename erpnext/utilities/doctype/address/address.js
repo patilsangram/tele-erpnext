@@ -12,9 +12,9 @@ frappe.ui.form.on("Address", "validate", function(frm) {
 	});
 });
 
-/*frappe.ui.form.on("Address", "onload", function(cur_frm) {
+frappe.ui.form.on("Address", "refresh", function(cur_frm) {
 	is_customer(cur_frm.doc)
-});*/
+});
 
 cur_frm.cscript.customer = function(doc){
 	is_customer(doc);

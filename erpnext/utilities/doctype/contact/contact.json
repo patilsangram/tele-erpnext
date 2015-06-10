@@ -33,6 +33,15 @@
    "permlevel": 0
   }, 
   {
+   "fieldname": "location_id", 
+   "fieldtype": "Link", 
+   "label": "Location ID", 
+   "options": "Address", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "cb00", 
    "fieldtype": "Column Break", 
    "permlevel": 0
@@ -160,6 +169,13 @@
    "permlevel": 0
   }, 
   {
+   "fieldname": "more_info_cb", 
+   "fieldtype": "Column Break", 
+   "label": "more info cb", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "description": "Enter designation of this Contact", 
    "fieldname": "designation", 
    "fieldtype": "Data", 
@@ -171,13 +187,29 @@
    "fieldtype": "Check", 
    "label": "Unsubscribed", 
    "permlevel": 0
+  }, 
+  {
+   "fieldname": "notification_details", 
+   "fieldtype": "Section Break", 
+   "label": "Notification Details", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "default": "Via Email", 
+   "fieldname": "notification_mode", 
+   "fieldtype": "Select", 
+   "label": "Notification Mode", 
+   "options": "Via Email\nVia SMS\nBoth", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "icon": "icon-user", 
  "idx": 1, 
  "in_create": 0, 
  "in_dialog": 0, 
- "modified": "2015-03-18 07:06:43.906702", 
+ "modified": "2015-06-09 21:25:52.146904", 
  "modified_by": "Administrator", 
  "module": "Utilities", 
  "name": "Contact", 

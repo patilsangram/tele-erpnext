@@ -50,6 +50,13 @@
    "search_index": 0
   }, 
   {
+   "fieldname": "model_number", 
+   "fieldtype": "Data", 
+   "label": "Model Number", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "default": "Not Available", 
    "description": "Only Serial Nos with status \"Available\" can be delivered.", 
    "fieldname": "status", 
@@ -228,6 +235,13 @@
    "no_copy": 1, 
    "permlevel": 0, 
    "read_only": 1
+  }, 
+  {
+   "fieldname": "service_date", 
+   "fieldtype": "Date", 
+   "label": "Service Date", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "delivery_details", 
@@ -417,7 +431,7 @@
  "icon": "icon-barcode", 
  "idx": 1, 
  "in_create": 0, 
- "modified": "2015-02-20 05:08:12.961403", 
+ "modified": "2015-06-09 21:21:06.571783", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Serial No", 

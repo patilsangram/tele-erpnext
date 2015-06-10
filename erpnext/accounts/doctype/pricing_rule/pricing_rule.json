@@ -187,6 +187,34 @@
    "permlevel": 0
   }, 
   {
+   "fieldname": "markup", 
+   "fieldtype": "Section Break", 
+   "label": "Markup", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "type", 
+   "fieldtype": "Select", 
+   "label": "Type", 
+   "options": "Percentage\nAmount", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "column_break_27", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "fieldname": "rate", 
+   "fieldtype": "Float", 
+   "label": "Rate", 
+   "permlevel": 0, 
+   "precision": "2"
+  }, 
+  {
    "fieldname": "price_discount_section", 
    "fieldtype": "Section Break", 
    "label": "Price / Discount", 
@@ -245,7 +273,7 @@
  "icon": "icon-gift", 
  "idx": 1, 
  "istable": 0, 
- "modified": "2015-02-26 04:26:13.240166", 
+ "modified": "2015-06-09 21:37:23.692363", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Pricing Rule", 

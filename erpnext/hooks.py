@@ -107,4 +107,4 @@ get_translated_dict = {
 	("doctype", "Global Defaults"): "frappe.geo.country_info.get_translated_dict"
 }
 
-fixtures = ["Custom Field"]
+fixtures = ["Role"]

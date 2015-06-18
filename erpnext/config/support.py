@@ -10,6 +10,7 @@ def get_data():
 				{
 					"type": "doctype",
 					"name": "Issue",
+					"label": "Support Queue",
 					"description": _("Support queries from customers."),
 				},
 				{

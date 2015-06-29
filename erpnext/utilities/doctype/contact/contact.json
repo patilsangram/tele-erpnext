@@ -39,7 +39,7 @@
    "options": "Address", 
    "permlevel": 0, 
    "precision": "", 
-   "read_only": 1
+   "read_only": 0
   }, 
   {
    "fieldname": "cb00", 
@@ -209,7 +209,7 @@
  "idx": 1, 
  "in_create": 0, 
  "in_dialog": 0, 
- "modified": "2015-06-09 21:25:52.146904", 
+ "modified": "2015-06-25 20:43:29.859228", 
  "modified_by": "Administrator", 
  "module": "Utilities", 
  "name": "Contact", 

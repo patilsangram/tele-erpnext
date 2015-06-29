@@ -1084,7 +1084,7 @@
  "idx": 1, 
  "in_create": 0, 
  "is_submittable": 1, 
- "modified": "2015-06-09 20:57:19.221392", 
+ "modified": "2015-06-25 20:56:02.903252", 
  "modified_by": "Administrator", 
  "module": "Stock", 
  "name": "Delivery Note", 
@@ -1160,7 +1160,8 @@
    "print": 1, 
    "read": 1, 
    "report": 1, 
-   "role": "Customer"
+   "role": "Customer", 
+   "set_user_permissions": 0
   }, 
   {
    "permlevel": 1, 

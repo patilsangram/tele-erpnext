@@ -1287,7 +1287,7 @@
  "icon": "icon-file-text", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-06-09 21:07:25.627856", 
+ "modified": "2015-06-25 20:56:06.593085", 
  "modified_by": "Administrator", 
  "module": "Accounts", 
  "name": "Sales Invoice", 
@@ -1333,7 +1333,8 @@
    "print": 1, 
    "read": 1, 
    "report": 1, 
-   "role": "Customer"
+   "role": "Customer", 
+   "set_user_permissions": 0
   }, 
   {
    "permlevel": 1, 

@@ -113,8 +113,8 @@ def get_data():
 				},
 				{
 					"type": "doctype",
-					"name": "POS Setting",
-					"label": _("Point-of-Sale Setting"),
+					"name": "POS Profile",
+					"label": _("Point-of-Sale Profile"),
 					"description": _("Rules to calculate shipping amount for a sale")
 				},
 				{
@@ -329,4 +329,25 @@ def get_data():
 				},
 			]
 		},
+		{
+			"label": _("Help"),
+			"icon": "icon-facetime-video",
+			"items": [
+				{
+					"type": "help",
+					"label": _("Chart of Accounts"),
+					"youtube_id": "DyR-DST-PyA"
+				},
+				{
+					"type": "help",
+					"label": _("Opening Accounting Balance"),
+					"youtube_id": "kdgM20Q-q68"
+				},
+				{
+					"type": "help",
+					"label": _("Setting up Taxes"),
+					"youtube_id": "nQ1zZdPgdaQ"
+				}
+			]
+		}
 	]

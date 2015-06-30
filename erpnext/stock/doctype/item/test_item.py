@@ -34,6 +34,8 @@ class TestItem(unittest.TestCase):
 		se = make_stock_entry(item_code=item.name, target="Stores - _TC", qty=1, incoming_rate=1)
 
 		item.has_variants = 1
+		item.append("variants", {"item_attribute": "Test Size", "item_attribute_value": "Small"})
+		
 		self.assertRaises(ItemTemplateCannotHaveStock, item.save)
 
 	def test_variant_item_codes(self):
@@ -88,7 +90,7 @@ class TestItem(unittest.TestCase):
 			"income_account": "Sales - _TC",
 			"expense_account": "_Test Account Cost for Goods Sold - _TC",
 			"cost_center": "_Test Cost Center 2 - _TC",
-			"qty": 0.0,
+			"qty": 1.0,
 			"price_list_rate": 100.0,
 			"base_price_list_rate": 0.0,
 			"discount_percentage": 0.0,

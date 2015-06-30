@@ -158,19 +158,20 @@
   }, 
   {
    "fieldname": "purchase_document_type", 
-   "fieldtype": "Select", 
+   "fieldtype": "Link", 
    "label": "Creation Document Type", 
    "no_copy": 1, 
-   "options": "\nPurchase Receipt\nStock Entry\nSerial No", 
+   "options": "DocType", 
    "permlevel": 0, 
    "read_only": 1
   }, 
   {
    "fieldname": "purchase_document_no", 
-   "fieldtype": "Data", 
+   "fieldtype": "Dynamic Link", 
    "hidden": 0, 
    "label": "Creation Document No", 
    "no_copy": 1, 
+   "options": "purchase_document_type", 
    "permlevel": 0, 
    "read_only": 1
   }, 

@@ -245,7 +245,7 @@
    "depends_on": "eval:doc.price_or_discount==\"Discount Percentage\"", 
    "fieldname": "discount_percentage", 
    "fieldtype": "Float", 
-   "label": "Discount Percentage", 
+   "label": "Discount on Price List Rate (%)", 
    "permlevel": 0
   }, 
   {

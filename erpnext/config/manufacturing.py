@@ -55,6 +55,14 @@ def get_data():
 					"name": "BOM Replace Tool",
 					"description": _("Replace Item / BOM in all BOMs"),
 				},
+				{
+					"type": "page",
+					"name": "bom-browser",
+					"icon": "icon-sitemap",
+					"label": _("BOM Browser"),
+					"description": _("Tree of Bill of Materials"),
+					"doctype": "BOM"
+				}
 			]
 		},
 		{
@@ -95,6 +103,23 @@ def get_data():
 					"name": "Completed Production Orders",
 					"doctype": "Production Order"
 				},
+				{
+					"type": "report",
+					"is_query_report": True,
+					"name": "BOM Search",
+					"doctype": "BOM"
+				},
 			]
 		},
+		{
+			"label": _("Help"),
+			"icon": "icon-facetime-video",
+			"items": [
+				{
+					"type": "help",
+					"label": _("Bill of Materials"),
+					"youtube_id": "hDV0c1OeWLo"
+				},
+			]
+		}
 	]

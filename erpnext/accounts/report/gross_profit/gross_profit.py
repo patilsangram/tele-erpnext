@@ -14,7 +14,7 @@ def execute(filters=None):
 	source = gross_profit_data.grouped_data if filters.get("group_by") != "Invoice" else gross_profit_data.data
 
 	group_wise_columns = frappe._dict({
-		"invoice": ["name", "posting_date", "posting_time", "item_code", "item_name", "brand", "description", \
+		"invoice": ["parent", "customer", "posting_date", "posting_time", "item_code", "item_name", "brand", "description", \
 			"warehouse", "qty", "base_rate", "buying_rate", "base_amount",
 			"buying_amount", "gross_profit", "gross_profit_percent", "project"],
 		"item_code": ["item_code", "item_name", "brand", "description", "warehouse", "qty", "base_rate",
@@ -50,7 +50,7 @@ def execute(filters=None):
 def get_columns(group_wise_columns, filters):
 	columns = []
 	column_map = frappe._dict({
-		"name": _("Sales Invoice") + ":Link/Sales Invoice:120",
+		"parent": _("Sales Invoice") + ":Link/Sales Invoice:120",
 		"posting_date": _("Posting Date") + ":Date",
 		"posting_time": _("Posting Time"),
 		"item_code": _("Item Code") + ":Link/Item",
@@ -98,7 +98,7 @@ class GrossProfitGenerator(object):
 
 			row.base_amount = flt(row.base_net_amount)
 
-			sales_boms = self.sales_boms.get(row.parenttype, {}).get(row.name, frappe._dict())
+			sales_boms = self.sales_boms.get(row.parenttype, {}).get(row.parent, frappe._dict())
 
 			# get buying amount
 			if row.item_code in sales_boms:
@@ -158,7 +158,7 @@ class GrossProfitGenerator(object):
 
 	def get_buying_amount_from_sales_bom(self, row, sales_bom):
 		buying_amount = 0.0
-		for bom_item in sales_bom[row.item_code]:
+		for bom_item in sales_bom:
 			if bom_item.get("parent_detail_docname")==row.item_row:
 				buying_amount += self.get_buying_amount(row, bom_item.item_code)
 
@@ -174,10 +174,11 @@ class GrossProfitGenerator(object):
 			return flt(row.qty) * item_rate
 
 		else:
-			if row.dn_detail:
-				row.parenttype = "Delivery Note"
-				row.parent = row.delivery_note
-				row.item_row = row.dn_detail
+			if row.update_stock or row.dn_detail:
+				if row.dn_detail:
+					row.parenttype = "Delivery Note"
+					row.parent = row.delivery_note
+					row.item_row = row.dn_detail
 
 				my_sle = self.sle.get((item_code, row.warehouse))
 				for i, sle in enumerate(my_sle):
@@ -215,7 +216,7 @@ class GrossProfitGenerator(object):
 		if self.filters.to_date:
 			conditions += " and posting_date <= %(to_date)s"
 
-		self.si_list = frappe.db.sql("""select item.parenttype, si.name,
+		self.si_list = frappe.db.sql("""select item.parenttype, item.parent, 
 				si.posting_date, si.posting_time, si.project_name, si.update_stock,
 				si.customer, si.customer_group, si.territory,
 				item.item_code, item.item_name, item.description, item.warehouse,

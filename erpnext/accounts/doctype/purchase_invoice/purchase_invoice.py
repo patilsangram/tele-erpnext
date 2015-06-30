@@ -3,7 +3,7 @@
 
 from __future__ import unicode_literals
 import frappe
-from frappe.utils import cint, formatdate, flt
+from frappe.utils import cint, formatdate, flt, getdate
 from frappe import msgprint, _, throw
 from erpnext.setup.utils import get_company_currency
 import frappe.defaults
@@ -39,6 +39,7 @@ class PurchaseInvoice(BuyingController):
 
 		self.po_required()
 		self.pr_required()
+		self.validate_supplier_invoice()
 		self.check_active_purchase_items()
 		self.check_conversion_rate()
 		self.validate_credit_to_acc()
@@ -87,9 +88,7 @@ class PurchaseInvoice(BuyingController):
 			throw(_("Conversion rate cannot be 0 or 1"))
 
 	def validate_credit_to_acc(self):
-		root_type, account_type = frappe.db.get_value("Account", self.credit_to, ["root_type", "account_type"])
-		if root_type != "Liability":
-			frappe.throw(_("Credit To account must be a liability account"))
+		account_type = frappe.db.get_value("Account", self.credit_to, "account_type")
 		if account_type != "Payable":
 			frappe.throw(_("Credit To account must be a Payable account"))
 
@@ -385,6 +384,16 @@ class PurchaseInvoice(BuyingController):
 				project.update_purchase_costing()
 				project.save()
 				project_list.append(d.project_name)
+				
+	def validate_supplier_invoice(self):
+		if self.bill_date:
+			if getdate(self.bill_date) > getdate(self.posting_date):
+				frappe.throw("Supplier Invoice Date cannot be greater than Posting Date")
+		if self.bill_no:
+			if cint(frappe.db.get_single_value("Accounts Settings", "check_supplier_invoice_uniqueness")):
+				pi = frappe.db.exists("Purchase Invoice", {"bill_no": self.bill_no, "fiscal_year": self.fiscal_year})
+				if pi:
+					frappe.throw("Supplier Invoice No exists in Purchase Invoice {0}".format(pi))
 
 @frappe.whitelist()
 def get_expense_account(doctype, txt, searchfield, start, page_len, filters):
@@ -401,4 +410,4 @@ def get_expense_account(doctype, txt, searchfield, start, page_len, filters):
 				and tabAccount.company = '%(company)s'
 				and tabAccount.%(key)s LIKE '%(txt)s'
 				%(mcond)s""" % {'company': filters['company'], 'key': searchfield,
-			'txt': "%%%s%%" % txt, 'mcond':get_match_cond(doctype)})
+			'txt': "%%%s%%" % frappe.db.escape(txt), 'mcond':get_match_cond(doctype)})

@@ -96,10 +96,21 @@
    "oldfieldtype": "Data", 
    "options": "Email", 
    "permlevel": 0, 
-   "reqd": 1
+   "reqd": 0
   }, 
   {
-   "depends_on": "eval:doc.__islocal", 
+   "fieldname": "fold", 
+   "fieldtype": "Fold", 
+   "permlevel": 0
+  }, 
+  {
+   "fieldname": "section_break_7", 
+   "fieldtype": "Section Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "", 
    "fieldname": "description", 
    "fieldtype": "Text", 
    "label": "Description", 
@@ -109,26 +120,37 @@
    "reqd": 0
   }, 
   {
-   "fieldname": "fold", 
-   "fieldtype": "Fold", 
+   "fieldname": "column_break_9", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "eval:!doc.__islocal", 
+   "fieldname": "resolution_date", 
+   "fieldtype": "Datetime", 
+   "in_filter": 0, 
+   "label": "Resolution Date", 
+   "no_copy": 1, 
+   "oldfieldname": "resolution_date", 
+   "oldfieldtype": "Date", 
+   "permlevel": 0, 
+   "read_only": 1, 
+   "search_index": 0
+  }, 
+  {
+   "fieldname": "first_responded_on", 
+   "fieldtype": "Datetime", 
+   "label": "First Responded On", 
    "permlevel": 0
   }, 
   {
    "fieldname": "additional_info", 
    "fieldtype": "Section Break", 
-   "label": "Reference", 
+   "label": "", 
    "options": "icon-pushpin", 
    "permlevel": 0, 
    "read_only": 1
-  }, 
-  {
-   "depends_on": "eval:!doc.__islocal", 
-   "fieldname": "column_break0", 
-   "fieldtype": "Column Break", 
-   "oldfieldtype": "Column Break", 
-   "permlevel": 0, 
-   "read_only": 1, 
-   "width": "50%"
   }, 
   {
    "fieldname": "lead", 
@@ -143,6 +165,12 @@
    "label": "Contact", 
    "options": "Contact", 
    "permlevel": 0
+  }, 
+  {
+   "fieldname": "column_break_16", 
+   "fieldtype": "Column Break", 
+   "permlevel": 0, 
+   "precision": ""
   }, 
   {
    "fieldname": "customer", 
@@ -169,6 +197,31 @@
    "read_only": 1, 
    "reqd": 0, 
    "search_index": 0
+  }, 
+  {
+   "fieldname": "section_break_19", 
+   "fieldtype": "Section Break", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
+   "depends_on": "eval:!doc.__islocal", 
+   "fieldname": "resolution_details", 
+   "fieldtype": "Small Text", 
+   "label": "Resolution Details", 
+   "no_copy": 1, 
+   "oldfieldname": "resolution_details", 
+   "oldfieldtype": "Text", 
+   "permlevel": 0, 
+   "read_only": 0
+  }, 
+  {
+   "depends_on": "eval:!doc.__islocal", 
+   "fieldname": "column_break1", 
+   "fieldtype": "Column Break", 
+   "oldfieldtype": "Column Break", 
+   "permlevel": 0, 
+   "read_only": 1
   }, 
   {
    "default": "Today", 
@@ -201,49 +254,19 @@
    "reqd": 0
   }, 
   {
-   "depends_on": "eval:!doc.__islocal", 
-   "fieldname": "column_break1", 
-   "fieldtype": "Column Break", 
-   "oldfieldtype": "Column Break", 
-   "permlevel": 0, 
-   "read_only": 1
-  }, 
-  {
-   "fieldname": "first_responded_on", 
-   "fieldtype": "Datetime", 
-   "label": "First Responded On", 
-   "permlevel": 0
-  }, 
-  {
-   "depends_on": "eval:!doc.__islocal", 
-   "fieldname": "resolution_date", 
-   "fieldtype": "Datetime", 
-   "in_filter": 0, 
-   "label": "Resolution Date", 
-   "no_copy": 1, 
-   "oldfieldname": "resolution_date", 
-   "oldfieldtype": "Date", 
-   "permlevel": 0, 
-   "read_only": 1, 
-   "search_index": 0
-  }, 
-  {
-   "depends_on": "eval:!doc.__islocal", 
-   "fieldname": "resolution_details", 
-   "fieldtype": "Small Text", 
-   "label": "Resolution Details", 
-   "no_copy": 1, 
-   "oldfieldname": "resolution_details", 
-   "oldfieldtype": "Text", 
-   "permlevel": 0, 
-   "read_only": 0
-  }, 
-  {
    "fieldname": "content_type", 
    "fieldtype": "Data", 
    "hidden": 1, 
    "label": "Content Type", 
    "permlevel": 0
+  }, 
+  {
+   "fieldname": "attachment", 
+   "fieldtype": "Attach", 
+   "hidden": 1, 
+   "label": "Attachment", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "icon": "icon-ticket", 

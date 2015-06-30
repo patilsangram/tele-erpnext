@@ -487,7 +487,7 @@
    "default": "Grand Total", 
    "fieldname": "apply_discount_on", 
    "fieldtype": "Select", 
-   "label": "Apply Discount On", 
+   "label": "Apply Additional Discount On", 
    "options": "\nGrand Total\nNet Total", 
    "permlevel": 0, 
    "precision": "", 
@@ -501,7 +501,7 @@
   {
    "fieldname": "discount_amount", 
    "fieldtype": "Currency", 
-   "label": "Discount Amount", 
+   "label": "Additional Discount Amount", 
    "options": "currency", 
    "permlevel": 0, 
    "print_hide": 1
@@ -509,7 +509,7 @@
   {
    "fieldname": "base_discount_amount", 
    "fieldtype": "Currency", 
-   "label": "Discount Amount (Company Currency)", 
+   "label": "Additional Discount Amount (Company Currency)", 
    "options": "Company:company:default_currency", 
    "permlevel": 0, 
    "precision": "", 
@@ -1090,13 +1090,22 @@
    "no_copy": 1, 
    "permlevel": 0, 
    "print_hide": 1
+  }, 
+  {
+   "depends_on": "eval:doc.is_recurring==1", 
+   "fieldname": "recurring_print_format", 
+   "fieldtype": "Link", 
+   "label": "Recurring Print Format", 
+   "options": "Print Format", 
+   "permlevel": 0, 
+   "precision": ""
   }
  ], 
  "icon": "icon-file-text", 
  "idx": 1, 
  "is_submittable": 1, 
  "issingle": 0, 
- "modified": "2015-06-25 20:56:04.679539", 
+ "modified": "2015-06-22 07:29:24.379272", 
  "modified_by": "Administrator", 
  "module": "Selling", 
  "name": "Sales Order", 
@@ -1170,8 +1179,7 @@
    "permlevel": 0, 
    "print": 1, 
    "read": 1, 
-   "role": "Customer", 
-   "set_user_permissions": 0
+   "role": "Customer"
   }, 
   {
    "apply_user_permissions": 1, 

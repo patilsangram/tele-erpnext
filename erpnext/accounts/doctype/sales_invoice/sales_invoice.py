@@ -65,8 +65,7 @@ class SalesInvoice(SellingController):
 		self.set_against_income_account()
 		self.validate_c_form()
 		self.validate_time_logs_are_submitted()
-		self.validate_multiple_billing("Delivery Note", "dn_detail", "amount",
-			"items")
+		self.validate_multiple_billing("Delivery Note", "dn_detail", "amount", "items")
 
 	def on_submit(self):
 		super(SalesInvoice, self).on_submit()
@@ -160,12 +159,12 @@ class SalesInvoice(SellingController):
 					frappe.throw(_("Time Log Batch {0} must be 'Submitted'").format(d.time_log_batch))
 
 	def set_pos_fields(self, for_validate=False):
-		"""Set retail related fields from pos settings"""
+		"""Set retail related fields from POS Profiles"""
 		if cint(self.is_pos) != 1:
 			return
 
-		from erpnext.stock.get_item_details import get_pos_settings_item_details, get_pos_settings
-		pos = get_pos_settings(self.company)
+		from erpnext.stock.get_item_details import get_pos_profiles_item_details, get_pos_profiles
+		pos = get_pos_profiles(self.company)
 
 		if pos:
 			if not for_validate and not self.customer:
@@ -184,7 +183,7 @@ class SalesInvoice(SellingController):
 			# set pos values in items
 			for item in self.get("items"):
 				if item.get('item_code'):
-					for fname, val in get_pos_settings_item_details(pos,
+					for fname, val in get_pos_profiles_item_details(pos,
 						frappe._dict(item.as_dict()), pos).items():
 
 						if (not for_validate) or (for_validate and not item.get(fname)):
@@ -236,9 +235,7 @@ class SalesInvoice(SellingController):
 			reconcile_against_document(lst)
 
 	def validate_debit_to_acc(self):
-		root_type, account_type = frappe.db.get_value("Account", self.debit_to, ["root_type", "account_type"])
-		if root_type != "Asset":
-			frappe.throw(_("Debit To account must be a liability account"))
+		account_type = frappe.db.get_value("Account", self.debit_to, "account_type")
 		if account_type != "Receivable":
 			frappe.throw(_("Debit To account must be a Receivable account"))
 
@@ -371,24 +368,24 @@ class SalesInvoice(SellingController):
 
 
 	def get_warehouse(self):
-		user_pos_setting = frappe.db.sql("""select name, warehouse from `tabPOS Setting`
+		user_pos_profile = frappe.db.sql("""select name, warehouse from `tabPOS Profile`
 			where ifnull(user,'') = %s and company = %s""", (frappe.session['user'], self.company))
-		warehouse = user_pos_setting[0][1] if user_pos_setting else None
+		warehouse = user_pos_profile[0][1] if user_pos_profile else None
 
 		if not warehouse:
-			global_pos_setting = frappe.db.sql("""select name, warehouse from `tabPOS Setting`
+			global_pos_profile = frappe.db.sql("""select name, warehouse from `tabPOS Profile`
 				where ifnull(user,'') = '' and company = %s""", self.company)
 
-			if global_pos_setting:
-				warehouse = global_pos_setting[0][1]
-			elif not user_pos_setting:
-				msgprint(_("POS Setting required to make POS Entry"), raise_exception=True)
+			if global_pos_profile:
+				warehouse = global_pos_profile[0][1]
+			elif not user_pos_profile:
+				msgprint(_("POS Profile required to make POS Entry"), raise_exception=True)
 
 		return warehouse
 
 	def on_update(self):
 		if cint(self.update_stock) == 1:
-			# Set default warehouse from pos setting
+			# Set default warehouse from POS Profile
 			if cint(self.is_pos) == 1:
 				w = self.get_warehouse()
 				if w:
@@ -614,7 +611,7 @@ def get_income_account(doctype, txt, searchfield, start, page_len, filters):
 				and tabAccount.company = '%(company)s'
 				and tabAccount.%(key)s LIKE '%(txt)s'
 				%(mcond)s""" % {'company': filters['company'], 'key': searchfield,
-			'txt': "%%%s%%" % txt, 'mcond':get_match_cond(doctype)})
+			'txt': "%%%s%%" % frappe.db.escape(txt), 'mcond':get_match_cond(doctype)})
 
 @frappe.whitelist()
 def make_delivery_note(source_name, target_doc=None):

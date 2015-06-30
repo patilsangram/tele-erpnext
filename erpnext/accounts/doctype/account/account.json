@@ -35,7 +35,7 @@
    "permlevel": 0, 
    "read_only": 1, 
    "reqd": 1, 
-   "search_index": 1
+   "search_index": 0
   }, 
   {
    "default": "0", 
@@ -44,7 +44,7 @@
    "label": "Is Group", 
    "permlevel": 0, 
    "precision": "", 
-   "search_index": 1
+   "search_index": 0
   }, 
   {
    "fieldname": "company", 
@@ -57,7 +57,7 @@
    "permlevel": 0, 
    "read_only": 1, 
    "reqd": 1, 
-   "search_index": 1
+   "search_index": 0
   }, 
   {
    "fieldname": "root_type", 
@@ -101,7 +101,7 @@
    "label": "Account Type", 
    "oldfieldname": "account_type", 
    "oldfieldtype": "Select", 
-   "options": "\nBank\nCash\nTax\nChargeable\nWarehouse\nReceivable\nPayable\nEquity\nFixed Asset\nCost of Goods Sold\nExpense Account\nIncome Account\nStock Received But Not Billed\nExpenses Included In Valuation\nStock Adjustment\nStock\nTemporary", 
+   "options": "\nBank\nCash\nTax\nChargeable\nWarehouse\nReceivable\nPayable\nEquity\nFixed Asset\nCost of Goods Sold\nExpense Account\nRound Off\nIncome Account\nStock Received But Not Billed\nExpenses Included In Valuation\nStock Adjustment\nStock\nTemporary", 
    "permlevel": 0, 
    "search_index": 0
   }, 
@@ -147,7 +147,8 @@
    "label": "Lft", 
    "permlevel": 0, 
    "print_hide": 1, 
-   "read_only": 1
+   "read_only": 1, 
+   "search_index": 1
   }, 
   {
    "fieldname": "rgt", 
@@ -156,7 +157,8 @@
    "label": "Rgt", 
    "permlevel": 0, 
    "print_hide": 1, 
-   "read_only": 1
+   "read_only": 1, 
+   "search_index": 1
   }, 
   {
    "fieldname": "old_parent", 

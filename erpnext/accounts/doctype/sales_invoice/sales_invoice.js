@@ -24,7 +24,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 				this.frm.set_value("is_pos", 1);
 				this.is_pos(function() {
 					if (cint(frappe.defaults.get_user_defaults("fs_pos_view"))===1)
-						erpnext.pos.toggle(me.frm);
+						erpnext.pos.toggle(me.frm, true);
 				});
 			}
 		}
@@ -66,7 +66,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 					});
 
 				if(!from_delivery_note) {
-					cur_frm.page.add_menu_item(__('Make Delivery'), cur_frm.cscript['Make Delivery Note'], "icon-truck")
+					cur_frm.add_custom_button(__('Make Delivery'), cur_frm.cscript['Make Delivery Note'], "icon-truck")
 				}
 			}
 
@@ -76,14 +76,14 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 		}
 
 		// Show buttons only when pos view is active
-		if (doc.docstatus===0 && !this.pos_active) {
+		if (cint(doc.docstatus==0) && cur_frm.page.current_view_name!=="pos") {
 			cur_frm.cscript.sales_order_btn();
 			cur_frm.cscript.delivery_note_btn();
 		}
 	},
 
 	sales_order_btn: function() {
-		this.$sales_order_btn = cur_frm.page.add_menu_item(__('From Sales Order'),
+		this.$sales_order_btn = cur_frm.add_custom_button(__('From Sales Order'),
 			function() {
 				frappe.model.map_current_doc({
 					method: "erpnext.selling.doctype.sales_order.sales_order.make_sales_invoice",
@@ -100,7 +100,7 @@ erpnext.accounts.SalesInvoiceController = erpnext.selling.SellingController.exte
 	},
 
 	delivery_note_btn: function() {
-		this.$delivery_note_btn = cur_frm.page.add_menu_item(__('From Delivery Note'),
+		this.$delivery_note_btn = cur_frm.add_custom_button(__('From Delivery Note'),
 			function() {
 				frappe.model.map_current_doc({
 					method: "erpnext.stock.doctype.delivery_note.delivery_note.make_sales_invoice",
@@ -262,7 +262,7 @@ cur_frm.cscript.mode_of_payment = function(doc) {
 				if(r.message) {
 					cur_frm.set_value("cash_bank_account", r.message["account"]);
 				}
-			 	
+
 			 }
 		});
 	 }
@@ -400,8 +400,6 @@ cur_frm.cscript.on_submit = function(doc, cdt, cdn) {
 		new_doc("Sales Invoice");
 	}
 }
-
-
 
 cur_frm.set_query("debit_to", function(doc) {
 	return{

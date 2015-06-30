@@ -37,6 +37,16 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 		if(this.frm.fields_dict["items"]) {
 			this["items_remove"] = this.calculate_taxes_and_totals;
 		}
+		
+		if(this.frm.fields_dict["recurring_print_format"]) {
+			this.frm.set_query("recurring_print_format", function(doc) {
+				return{
+					filters: [
+						['Print Format', 'doc_type', '=', cur_frm.doctype],
+					]
+				}
+			});
+		}
 	},
 
 	onload_post_render: function() {
@@ -66,18 +76,22 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 
 	apply_default_taxes: function() {
 		var me = this;
-		return frappe.call({
-			method: "erpnext.controllers.accounts_controller.get_default_taxes_and_charges",
-			args: {
-				"master_doctype": frappe.meta.get_docfield(me.frm.doc.doctype, "taxes_and_charges",
-					me.frm.doc.name).options
-			},
-			callback: function(r) {
-				if(!r.exc) {
-					me.frm.set_value("taxes", r.message);
+		var taxes_and_charges_field = frappe.meta.get_docfield(me.frm.doc.doctype, "taxes_and_charges",
+			me.frm.doc.name);
+
+		if(taxes_and_charges_field) {
+			frappe.call({
+				method: "erpnext.controllers.accounts_controller.get_default_taxes_and_charges",
+				args: {
+					"master_doctype": taxes_and_charges_field.options
+				},
+				callback: function(r) {
+					if(!r.exc) {
+						me.frm.set_value("taxes", r.message);
+					}
 				}
-			}
-		});
+			});
+		}
 	},
 
 	setup_sms: function() {
@@ -94,11 +108,20 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 	},
 
 	hide_currency_and_price_list: function() {
-		if(this.frm.doc.docstatus > 0) {
+		if(this.frm.doc.conversion_rate == 1 && this.frm.doc.docstatus > 0) {
 			hide_field("currency_and_price_list");
 		} else {
 			unhide_field("currency_and_price_list");
 		}
+	},
+
+	barcode: function(doc, cdt, cdn) {
+		var d = locals[cdt][cdn];
+		if(d.barcode=="" || d.barcode==null) {
+			// barcode cleared, remove item
+			d.item_code = "";
+		}
+		this.item_code(doc, cdt, cdn);
 	},
 
 	item_code: function(doc, cdt, cdn) {
@@ -206,9 +229,11 @@ erpnext.TransactionController = erpnext.taxes_and_totals.extend({
 					me.frm.set_value('plc_conversion_rate', 1.0);
 				}
 				if (company_doc.default_letter_head) {
-					me.frm.set_value("letter_head", company_doc.default_letter_head);
+					if(me.frm.fields_dict.letter_head) {
+						me.frm.set_value("letter_head", company_doc.default_letter_head);
+					}
 				}
-				if (company_doc.default_terms) {
+				if (company_doc.default_terms && me.frm.doc.doctype != "Purchase Invoice") {
 					me.frm.set_value("tc_name", company_doc.default_terms);
 				}
 
@@ -781,3 +806,5 @@ frappe.ui.form.on(cur_frm.doctype, "discount_amount", function(frm) {
 	cur_frm.cscript.set_dynamic_labels();
 	cur_frm.cscript.calculate_taxes_and_totals();
 })
+
+

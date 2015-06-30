@@ -510,7 +510,7 @@
    "default": "Grand Total", 
    "fieldname": "apply_discount_on", 
    "fieldtype": "Select", 
-   "label": "Apply Discount On", 
+   "label": "Apply Additional Discount On", 
    "options": "\nGrand Total\nNet Total", 
    "permlevel": 0, 
    "precision": ""
@@ -523,7 +523,7 @@
   {
    "fieldname": "discount_amount", 
    "fieldtype": "Currency", 
-   "label": "Discount Amount", 
+   "label": "Additional Discount Amount", 
    "options": "currency", 
    "permlevel": 0, 
    "print_hide": 1
@@ -531,7 +531,7 @@
   {
    "fieldname": "base_discount_amount", 
    "fieldtype": "Currency", 
-   "label": "Discount Amount (Company Currency)", 
+   "label": "Additional Discount Amount (Company Currency)", 
    "options": "Company:company:default_currency", 
    "permlevel": 0, 
    "precision": "", 
@@ -1160,8 +1160,7 @@
    "print": 1, 
    "read": 1, 
    "report": 1, 
-   "role": "Customer", 
-   "set_user_permissions": 0
+   "role": "Customer"
   }, 
   {
    "permlevel": 1, 

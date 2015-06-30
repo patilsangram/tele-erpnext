@@ -3,13 +3,13 @@
 
 from __future__ import unicode_literals
 import frappe
-from frappe.utils import flt, getdate
+from frappe.utils import flt, getdate, cstr
 from frappe import _
 
 def execute(filters=None):
 	account_details = {}
 	for acc in frappe.db.sql("""select name, is_group from tabAccount""", as_dict=1):
-			account_details.setdefault(acc.name, acc)
+		account_details.setdefault(acc.name, acc)
 
 	validate_filters(filters, account_details)
 	validate_party(filters)
@@ -66,7 +66,7 @@ def get_gl_entries(filters):
 
 	gl_entries = frappe.db.sql("""select posting_date, account, party_type, party,
 			sum(ifnull(debit, 0)) as debit, sum(ifnull(credit, 0)) as credit,
-			voucher_type, voucher_no, cost_center, remarks, is_opening, against
+			voucher_type, voucher_no, cost_center, remarks, against, is_opening
 		from `tabGL Entry`
 		where company=%(company)s {conditions}
 		{group_by_condition}
@@ -82,8 +82,6 @@ def get_conditions(filters):
 		lft, rgt = frappe.db.get_value("Account", filters["account"], ["lft", "rgt"])
 		conditions.append("""account in (select name from tabAccount
 			where lft>=%s and rgt<=%s and docstatus<2)""" % (lft, rgt))
-	else:
-		conditions.append("posting_date between %(from_date)s and %(to_date)s")
 
 	if filters.get("voucher_no"):
 		conditions.append("voucher_no=%(voucher_no)s")
@@ -93,6 +91,9 @@ def get_conditions(filters):
 
 	if filters.get("party"):
 		conditions.append("party=%(party)s")
+		
+	if not (filters.get("account") or filters.get("party") or filters.get("group_by_account")):
+		conditions.append("posting_date >=%(from_date)s")
 
 	from frappe.desk.reportview import build_match_conditions
 	match_conditions = build_match_conditions("GL Entry")
@@ -107,31 +108,31 @@ def get_data_with_opening_closing(filters, account_details, gl_entries):
 	opening, total_debit, total_credit, gle_map = get_accountwise_gle(filters, gl_entries, gle_map)
 
 	# Opening for filtered account
-	if filters.get("account"):
-		data += [get_balance_row("Opening", opening), {}]
+	if filters.get("account") or filters.get("party"):
+		data += [get_balance_row(_("Opening"), opening), {}]
 
 	for acc, acc_dict in gle_map.items():
 		if acc_dict.entries:
 			# Opening for individual ledger, if grouped by account
 			if filters.get("group_by_account"):
-				data.append(get_balance_row("Opening", acc_dict.opening))
+				data.append(get_balance_row(_("Opening"), acc_dict.opening))
 
 			data += acc_dict.entries
 
 			# Totals and closing for individual ledger, if grouped by account
 			if filters.get("group_by_account"):
-				data += [{"account": "Totals", "debit": acc_dict.total_debit,
+				data += [{"account": "'" + _("Totals") + "'", "debit": acc_dict.total_debit,
 					"credit": acc_dict.total_credit},
-					get_balance_row("Closing (Opening + Totals)",
+					get_balance_row(_("Closing (Opening + Totals)"),
 						(acc_dict.opening + acc_dict.total_debit - acc_dict.total_credit)), {}]
 
 	# Total debit and credit between from and to date
 	if total_debit or total_credit:
-		data.append({"account": "Totals", "debit": total_debit, "credit": total_credit})
+		data.append({"account": "'" + _("Totals") + "'", "debit": total_debit, "credit": total_credit})
 
 	# Closing for filtered account
-	if filters.get("account"):
-		data.append(get_balance_row("Closing (Opening + Totals)",
+	if filters.get("account") or filters.get("party"):
+		data.append(get_balance_row(_("Closing (Opening + Totals)"),
 			(opening + total_debit - total_credit)))
 
 	return data
@@ -150,13 +151,15 @@ def initialize_gle_map(gl_entries):
 
 def get_accountwise_gle(filters, gl_entries, gle_map):
 	opening, total_debit, total_credit = 0, 0, 0
-
+	from_date, to_date = getdate(filters.from_date), getdate(filters.to_date)
 	for gle in gl_entries:
 		amount = flt(gle.debit, 3) - flt(gle.credit, 3)
-		if filters.get("account") and gle.posting_date < getdate(filters.from_date):
+		if (filters.get("account") or filters.get("party") or filters.get("group_by_account")) \
+				and (gle.posting_date < from_date or cstr(gle.is_opening) == "Yes"):
 			gle_map[gle.account].opening += amount
-			opening += amount
-		elif gle.posting_date <= getdate(filters.to_date):
+			if filters.get("account") or filters.get("party"):
+				opening += amount
+		elif gle.posting_date <= to_date:
 			gle_map[gle.account].entries.append(gle)
 			gle_map[gle.account].total_debit += flt(gle.debit, 3)
 			gle_map[gle.account].total_credit += flt(gle.credit, 3)
@@ -168,7 +171,7 @@ def get_accountwise_gle(filters, gl_entries, gle_map):
 
 def get_balance_row(label, balance):
 	return {
-		"account": label,
+		"account": "'" + label + "'",
 		"debit": balance if balance > 0 else 0,
 		"credit": -1*balance if balance < 0 else 0,
 	}

@@ -120,7 +120,7 @@
   }, 
   {
    "default": "0", 
-   "description": "Check to make primary address", 
+   "description": "", 
    "fieldname": "is_primary_address", 
    "fieldtype": "Check", 
    "label": "Preferred Billing Address", 
@@ -128,7 +128,7 @@
   }, 
   {
    "default": "0", 
-   "description": "Check to make Shipping Address", 
+   "description": "", 
    "fieldname": "is_shipping_address", 
    "fieldtype": "Check", 
    "in_list_view": 0, 

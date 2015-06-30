@@ -5,7 +5,7 @@ app_publisher = "Frappe Technologies Pvt. Ltd. and Contributors"
 app_description = "Open Source Enterprise Resource Planning for Small and Midsized Organizations"
 app_icon = "icon-th"
 app_color = "#e74c3c"
-app_version = "5.0.6"
+app_version = "5.0.29"
 
 error_report_email = "support@erpnext.com"
 
@@ -34,20 +34,18 @@ website_context = {
 
 website_route_rules = [
 	{"from_route": "/orders", "to_route": "Sales Order"},
-	{"from_route": "/orders/<name>", "to_route": "print", "defaults": {"doctype": "Sales Order"}},
+	{"from_route": "/orders/<path:name>", "to_route": "print", "defaults": {"doctype": "Sales Order"}},
 	{"from_route": "/invoices", "to_route": "Sales Invoice"},
-	{"from_route": "/invoices/<name>", "to_route": "print", "defaults": {"doctype": "Sales Invoice"}},
+	{"from_route": "/invoices/<path:name>", "to_route": "print", "defaults": {"doctype": "Sales Invoice"}},
 	{"from_route": "/shipments", "to_route": "Delivery Note"},
-	{"from_route": "/shipments/<name>", "to_route": "print", "defaults": {"doctype": "Delivery Note"}},
-	{"from_route": "/issues", "to_route": "Issue"},
-	{"from_route": "/issues/<name>", "to_route": "print", "defaults": {"doctype": "Issue"}},
-	{"from_route": "/addresses", "to_route": "Address"},
+	{"from_route": "/shipments/<path:name>", "to_route": "print", "defaults": {"doctype": "Delivery Note"}}
 ]
 
 has_website_permission = {
 	"Sales Order": "erpnext.controllers.website_list_for_contact.has_website_permission",
 	"Sales Invoice": "erpnext.controllers.website_list_for_contact.has_website_permission",
-	"Delivery Note": "erpnext.controllers.website_list_for_contact.has_website_permission"
+	"Delivery Note": "erpnext.controllers.website_list_for_contact.has_website_permission",
+	"Issue": "erpnext.support.doctype.issue.issue.has_website_permission"
 }
 
 dump_report_map = "erpnext.startup.report_data_map.data_map"
@@ -96,8 +94,8 @@ scheduler_events = {
 	]
 }
 
-default_mail_footer = """<div style="padding: 7px; margin-top: 7px;">
-	<a style="color: #8D99A6; font-size: 85%; text-decoration: none;" href="https://erpnext.com" target="_blank">
+default_mail_footer = """<div style="padding: 15px; text-align: center;">
+	<a href="https://erpnext.com?source=via_email_footer" target="_blank" style="color: #8d99a6;">
 		Sent via ERPNext
 	</a>
 </div>"""

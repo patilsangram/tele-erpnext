@@ -240,6 +240,12 @@ def get_data():
 				{
 					"type": "report",
 					"is_query_report": True,
+					"name": "BOM Search",
+					"doctype": "BOM"
+				},
+				{
+					"type": "report",
+					"is_query_report": True,
 					"name": "Customers Not Buying Since Long Time",
 					"doctype": "Sales Order"
 				},
@@ -272,6 +278,16 @@ def get_data():
 					"is_query_report": True,
 					"name": "Customer Credit Balance",
 					"doctype": "Customer"
+				},
+			]
+		},
+		{
+			"label": _("Help"),
+			"items": [
+				{
+					"type": "help",
+					"label": _("Customer and Supplier"),
+					"youtube_id": "anoGi_RpQ20"
 				},
 			]
 		},

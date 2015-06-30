@@ -155,3 +155,15 @@ erpnext.patches.v5_0.reclculate_planned_operating_cost_in_production_order
 erpnext.patches.v5_0.repost_requested_qty
 erpnext.patches.v5_0.fix_taxes_and_totals_in_party_currency
 erpnext.patches.v5_0.update_tax_amount_after_discount_in_purchase_cycle
+erpnext.patches.v5_0.rename_pos_setting
+erpnext.patches.v5_0.update_operation_description
+erpnext.patches.v5_0.set_footer_address
+execute:frappe.db.set_value("Backup Manager", None, "send_backups_to_dropbox", 1 if frappe.db.get_value("Backup Manager", None, "upload_backups_to_dropbox") in ("Daily", "Weekly") else 0)
+execute:frappe.db.sql_list("delete from `tabDocPerm` where parent='Issue' and modified_by='Administrator' and role='Guest'")
+erpnext.patches.v5_0.update_item_and_description_again
+erpnext.patches.v5_0.repost_gle_for_jv_with_multiple_party
+erpnext.patches.v5_0.portal_fixes
+erpnext.patches.v5_0.reset_values_in_tools
+execute:frappe.delete_doc("Page", "users")
+erpnext.patches.v5_0.update_material_transferred_for_manufacturing_again
+erpnext.patches.v5_0.index_on_account_and_gl_entry

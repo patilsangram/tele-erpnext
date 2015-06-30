@@ -90,8 +90,9 @@ class ProductionOrder(Document):
 			(self.sales_order, self.production_item))[0][0]
 		# total qty in SO
 		so_qty = flt(so_item_qty) + flt(dnpi_qty)
-
-		if total_qty > so_qty:
+		
+		allowance_percentage = flt(frappe.db.get_single_value("Manufacturing Settings", "over_production_allowance_percentage"))
+		if total_qty > so_qty + (allowance_percentage/100 * so_qty):
 			frappe.throw(_("Cannot produce more Item {0} than Sales Order quantity {1}").format(self.production_item,
 				so_qty), OverProductionError)
 
@@ -176,18 +177,18 @@ class ProductionOrder(Document):
 		self.set('operations', [])
 
 		operations = frappe.db.sql("""select operation, description, workstation, idx,
-			hour_rate, time_in_mins, "Pending" as status from `tabBOM Operation` 
+			hour_rate, time_in_mins, "Pending" as status from `tabBOM Operation`
 			where parent = %s order by idx""", self.bom_no, as_dict=1)
 
 		self.set('operations', operations)
 		self.calculate_time()
-		
+
 	def calculate_time(self):
 		bom_qty = frappe.db.get_value("BOM", self.bom_no, "quantity")
-		
+
 		for d in self.get("operations"):
 			d.time_in_mins = flt(d.time_in_mins) / flt(bom_qty) * flt(self.qty)
-			
+
 		self.calculate_operating_cost()
 
 	def get_holidays(self, workstation):
@@ -217,9 +218,13 @@ class ProductionOrder(Document):
 		for i, d in enumerate(self.operations):
 			self.set_operation_start_end_time(i, d)
 
+			if not d.workstation:
+				continue
+
 			time_log = make_time_log(self.name, d.operation, d.planned_start_time, d.planned_end_time,
 				flt(self.qty) - flt(d.completed_qty), self.project_name, d.workstation, operation_id=d.name)
 
+			# validate operating hours if workstation [not mandatory] is specified
 			self.check_operation_fits_in_working_hours(d)
 
 			original_start_time = time_log.from_time
@@ -307,10 +312,9 @@ class ProductionOrder(Document):
 			self.actual_end_date = None
 
 	def validate_delivery_date(self):
-		if self.docstatus==1:
-			if self.planned_end_date and self.expected_delivery_date \
-				and getdate(self.expected_delivery_date) < getdate(self.planned_end_date):
-					frappe.msgprint(_("Production might not be able to finish by the Expected Delivery Date."))
+		if self.planned_start_date and self.expected_delivery_date \
+			and getdate(self.expected_delivery_date) < getdate(self.planned_start_date):
+				frappe.throw(_("Expected Delivery Date must be greater than Planned Start Date."))
 
 	def delete_time_logs(self):
 		for time_log in frappe.get_all("Time Log", ["name"], {"production_order": self.name}):

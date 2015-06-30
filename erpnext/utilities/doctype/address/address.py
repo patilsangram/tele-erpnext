@@ -108,3 +108,23 @@ def get_customer_addresses(doctype, txt, searchfield, start, page_len, filters):
 		condition = "customer<>''"
 
 	return frappe.db.sql("""select name from tabAddress where %s"""%condition)
+
+def get_list_context(context=None):
+	from erpnext.shopping_cart.cart import get_address_docs
+	return {
+		"title": _("My Addresses"),
+		"get_list": get_address_docs,
+		"row_template": "templates/includes/address_row.html",
+	}
+
+def has_website_permission(doc, ptype, user, verbose=False):
+	"""Returns true if customer or lead matches with user"""
+	customer = frappe.db.get_value("Contact", {"email_id": frappe.session.user}, "customer")
+	if customer:
+		return doc.customer == customer
+	else:
+		lead = frappe.db.get_value("Lead", {"email_id": frappe.session.user})
+		if lead:
+			return doc.lead == lead
+
+	return False

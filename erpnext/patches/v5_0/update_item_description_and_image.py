@@ -11,23 +11,23 @@ def execute():
 	for d in frappe.db.sql("select name, description_html, description from `tabItem`", as_dict=1):
 		description = cstr(d.description_html).strip() or cstr(d.description).strip()
 		image_url, new_desc = extract_image_and_description(description)
-		
+
 		item_details.setdefault(d.name, frappe._dict({
 			"old_description": description,
 			"new_description": new_desc,
 			"image_url": image_url
 		}))
-	
-	
+
+
 	dt_list= ["Purchase Order Item","Supplier Quotation Item", "BOM", "BOM Explosion Item" , \
 	"BOM Item", "Opportunity Item" , "Quotation Item" , "Sales Order Item" , "Delivery Note Item" , \
 	"Material Request Item" , "Purchase Receipt Item" , "Stock Entry Detail"]
 	for dt in dt_list:
 		frappe.reload_doctype(dt)
-		records = frappe.db.sql("""select name, `{0}` as item_code, description from `tab{1}` 
+		records = frappe.db.sql("""select name, `{0}` as item_code, description from `tab{1}`
 			where description is not null and image is null and description like '%%<img%%'"""
 			.format("item" if dt=="BOM" else "item_code", dt), as_dict=1)
-			
+
 		count = 1
 		for d in records:
 			if d.item_code and item_details.get(d.item_code) \
@@ -40,7 +40,7 @@ def execute():
 			if image_url:
 				frappe.db.sql("""update `tab{0}` set description = %s, image = %s
 					where name = %s """.format(dt), (desc, image_url, d.name))
-				
+
 				count += 1
 				if count % 500 == 0:
 					frappe.db.commit()
@@ -49,5 +49,5 @@ def execute():
 def extract_image_and_description(data):
 	image_url = find_first_image(data)
 	desc =  re.sub("\<img[^>]+\>", "", data)
-	
+
 	return image_url, desc

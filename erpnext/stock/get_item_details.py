@@ -52,7 +52,7 @@ def get_item_details(args):
 	get_price_list_rate(args, item_doc, out)
 
 	if args.transaction_type == "selling" and cint(args.is_pos):
-		out.update(get_pos_settings_item_details(args.company, args))
+		out.update(get_pos_profiles_item_details(args.company, args))
 
 	# update args with out, if key or value not exists
 	for key, value in out.iteritems():
@@ -238,8 +238,8 @@ def get_basic_details(args, item):
 		"uom": item.stock_uom,
 		"min_order_qty": flt(item.min_order_qty) if args.parenttype == "Material Request" else "",
 		"conversion_factor": 1.0,
-		"qty": args.qty or 0.0,
-		"stock_qty": 0.0,
+		"qty": args.qty or 1.0,
+		"stock_qty": 1.0,
 		"price_list_rate": 0.0,
 		"base_price_list_rate": 0.0,
 		"rate": 0.0,
@@ -342,16 +342,16 @@ def get_party_item_code(args, item_doc, out):
 		item_supplier = item_doc.get("supplier_items", {"supplier": args.supplier})
 		out.supplier_part_no = item_supplier[0].supplier_part_no if item_supplier else None
 
-def get_pos_settings_item_details(company, args, pos_settings=None):
+def get_pos_profiles_item_details(company, args, pos_profiles=None):
 	res = frappe._dict()
 
-	if not pos_settings:
-		pos_settings = get_pos_settings(company)
+	if not pos_profiles:
+		pos_profiles = get_pos_profiles(company)
 
-	if pos_settings:
+	if pos_profiles:
 		for fieldname in ("income_account", "cost_center", "warehouse", "expense_account"):
-			if not args.get(fieldname) and pos_settings.get(fieldname):
-				res[fieldname] = pos_settings.get(fieldname)
+			if not args.get(fieldname) and pos_profiles.get(fieldname):
+				res[fieldname] = pos_profiles.get(fieldname)
 
 		if res.get("warehouse"):
 			res.actual_qty = get_available_qty(args.item_code,
@@ -359,15 +359,15 @@ def get_pos_settings_item_details(company, args, pos_settings=None):
 
 	return res
 
-def get_pos_settings(company):
-	pos_settings = frappe.db.sql("""select * from `tabPOS Setting` where user = %s
+def get_pos_profiles(company):
+	pos_profiles = frappe.db.sql("""select * from `tabPOS Profile` where user = %s
 		and company = %s""", (frappe.session['user'], company), as_dict=1)
 
-	if not pos_settings:
-		pos_settings = frappe.db.sql("""select * from `tabPOS Setting`
+	if not pos_profiles:
+		pos_profiles = frappe.db.sql("""select * from `tabPOS Profile`
 			where ifnull(user,'') = '' and company = %s""", company, as_dict=1)
 
-	return pos_settings and pos_settings[0] or None
+	return pos_profiles and pos_profiles[0] or None
 
 
 def get_serial_nos_by_fifo(args, item_doc):

@@ -12,7 +12,6 @@ from frappe.model.document import Document
 class NamingSeriesNotSetError(frappe.ValidationError): pass
 
 class NamingSeries(Document):
-
 	def get_transactions(self, arg=None):
 		doctypes = list(set(frappe.db.sql_list("""select parent
 				from `tabDocField` where fieldname='naming_series'""")
@@ -21,12 +20,14 @@ class NamingSeries(Document):
 
 		prefixes = ""
 		for d in doctypes:
+			options = ""
 			try:
 				options = self.get_options(d)
 			except frappe.DoesNotExistError:
 				continue
 
-			prefixes = prefixes + "\n" + options
+			if options:
+				prefixes = prefixes + "\n" + options
 
 		prefixes.replace("\n\n", "\n")
 		prefixes = "\n".join(sorted(prefixes.split()))
@@ -49,7 +50,7 @@ class NamingSeries(Document):
 		self.set_series_for(self.select_doc_for_series, series_list)
 
 		# create series
-		map(self.insert_series, [d.split('.')[0] for d in series_list])
+		map(self.insert_series, [d.split('.')[0] for d in series_list if d.strip()])
 
 		msgprint(_("Series Updated"))
 

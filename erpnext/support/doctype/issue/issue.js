@@ -1,5 +1,18 @@
 {% include 'support/support_common.js' %}
 
+frappe.ui.form.on_change("Issue", "location_id",function(){
+	frappe.call({
+		method: "erpnext.utilities.doctype.address.address.get_address_display",
+		args: {
+			"address_dict": cur_frm.doc.location_id
+		},
+		callback: function(r) {
+			if (r.message)
+				cur_frm.set_value("address_display", r.message)
+		}
+	})
+});
+
 frappe.ui.form.on("Issue", {
 	"refresh": function(frm) {
 		if(frm.doc.status==="Open") {
@@ -61,7 +74,7 @@ cur_frm.fields_dict['contact'].get_query = function(doc, cdt, cdn) {
 	return {
 		filters:{
 			'location_id': doc.location_id,
-			'customer': doc.customer 
+			'customer': doc.customer
 		}
 	}
 }

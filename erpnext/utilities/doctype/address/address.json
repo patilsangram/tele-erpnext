@@ -76,7 +76,7 @@
    "fieldtype": "Data", 
    "in_filter": 1, 
    "in_list_view": 0, 
-   "label": "Pincode", 
+   "label": "Zip Code", 
    "permlevel": 0, 
    "search_index": 1
   }, 
@@ -120,7 +120,7 @@
   }, 
   {
    "default": "0", 
-   "description": "", 
+   "description": "Check to make primary address", 
    "fieldname": "is_primary_address", 
    "fieldtype": "Check", 
    "label": "Preferred Billing Address", 
@@ -128,7 +128,7 @@
   }, 
   {
    "default": "0", 
-   "description": "", 
+   "description": "Check to make Shipping Address", 
    "fieldname": "is_shipping_address", 
    "fieldtype": "Check", 
    "in_list_view": 0, 
@@ -207,7 +207,7 @@
  "icon": "icon-map-marker", 
  "idx": 1, 
  "in_dialog": 0, 
- "modified": "2015-06-09 21:32:38.433185", 
+ "modified": "2015-07-28 00:48:40.567873", 
  "modified_by": "Administrator", 
  "module": "Utilities", 
  "name": "Address", 

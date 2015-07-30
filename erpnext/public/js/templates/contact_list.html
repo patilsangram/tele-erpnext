@@ -11,6 +11,9 @@
                 {%= __("Primary") %}</span>{% } %}
         </div>
         <p style="padding-top: 5px;">
+            {% if(contact_list[i].location_id) { %}
+                {%= __("Location ID") %}: {%= contact_list[i].location_id %}<br>
+            {% } %}
             {% if(contact_list[i].phone) { %}
                 {%= __("Phone") %}: {%= contact_list[i].phone %}<br>
             {% } %}

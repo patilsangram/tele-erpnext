@@ -66,9 +66,10 @@ class Attendance(Document):
 		time_sheet_records = self.task_details
 
 		hours = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-		
+
 		for record in time_sheet_records:
 			rec = self.unicode_to_timedelta(record.in_time, record.out_time)
+			record.working_hours = ( rec["out_time"] - rec["in_time"] )
 			hours += ( rec["out_time"] - rec["in_time"] )
 
 		return hours
@@ -78,16 +79,16 @@ class Attendance(Document):
 			calculate the total break time in Hours
 		"""
 		time_sheet_records = self.task_details
-		
+
 		break_time = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-		
+
 		for i in range(0,len(time_sheet_records)):
 			if i+1 < len(time_sheet_records):
 				rec_1 = self.unicode_to_timedelta(time_sheet_records[i].in_time, time_sheet_records[i].out_time)
 				rec_2 = self.unicode_to_timedelta(time_sheet_records[i+1].in_time, time_sheet_records[i+1].out_time)
 
 				break_time += ( rec_2["in_time"] - rec_1["out_time"] )
-				
+
 		return break_time
 
 	def unicode_to_timedelta(self,in_time, out_time):

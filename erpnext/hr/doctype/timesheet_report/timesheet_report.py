@@ -46,7 +46,7 @@ class TimesheetReport(Document):
 
 			records = frappe.db.sql(query,as_dict=True)
 			records = self.get_formatted_records(records)
-			timesheet_html_report = self.get_html_code(records)
+			timesheet_html_report = self.get_html_code(records.get("timesheet_record"), records.get("timing_totals"))
 
 		# return timesheet_html_report
 
@@ -70,7 +70,7 @@ class TimesheetReport(Document):
 
 		days = ['Day','Fri','Sat','Sun','Mon','Tue','Wed','Thu']
 		dates = ["Date",'','','','','','','']
-		status = ['Status','','','','','','','']
+		status = ['Status','Absent','Absent','Absent','Absent','Absent','Absent','Absent']
 		in_time = ['In Time','','','','','','','']
 		out_time = ['Out Time','','','','','','','']
 		tasks = {}
@@ -107,12 +107,18 @@ class TimesheetReport(Document):
 				task:task_template
 			})
 
-		self.store_timings_for_total(tasks)
+		timing_totals = self.store_timings_for_total(tasks)
 
-		timesheet_record = [dates,in_time,out_time]
+		timesheet_record = [dates,status,in_time,out_time]
 		[timesheet_record.append(value) for key,value in tasks.iteritems()]
 
-		return timesheet_record
+		totals_row = self.get_totals_row(timing_totals)
+		timesheet_record.append(totals_row)
+
+		return {
+			"timesheet_record":timesheet_record,
+			"timing_totals":timing_totals
+		}
 
 	def store_timings_for_total(self,tasks):
 		from datetime import timedelta
@@ -121,11 +127,11 @@ class TimesheetReport(Document):
 		index_to_day={1:'Fri',2:'Sat',3:'Sun',4:'Mon',5:'Tue',6:'Wed',7:'Thu'}
 
 		for key,task in tasks.iteritems():
-			frappe.errprint(len(task))
+			task_total_time = timedelta(0)
+			c = 0
 			for rec in task:
 				i = task.index(rec)
-				task_total_time = timedelta(0)
-				if isinstance(rec,timedelta) and i != 9:
+				if isinstance(rec,timedelta) and (c != 9):
 					day = index_to_day.get(i)
 					# calculating total time spent on task
 					task_total_time += rec
@@ -140,24 +146,47 @@ class TimesheetReport(Document):
 						day:day_total_time,
 						key:task_total_time
 					})
+				c = c+1
+		return timing_totals
 
-		frappe.errprint(timing_totals)
-		s
+	def get_totals_row(self,totals):
+		from datetime import timedelta
+		index_to_day={1:'Fri',2:'Sat',3:'Sun',4:'Mon',5:'Tue',6:'Wed',7:'Thu'}
+		last_row = ["Total",'','','','','','','','','']
+		total = timedelta(0)
+		for i in range(2,9):
+			if totals.get(index_to_day.get(i)):
+				last_row[i] = totals.get(index_to_day.get(i))
+				total += totals.get(index_to_day.get(i))
+		totals.update({
+			"Total":total
+		})
+		return last_row
 
-	def get_html_code(self,records):
-		html_code = "<table class='table table-bordered' width=100%><tr><th rowspan='5' style='vertical-align: bottom;'>Job Name</th>\
+	def get_html_code(self,records,totals):
+		from datetime import timedelta
+
+		html_code = "<table class='table table-bordered' width=100%><tr><th rowspan='6' style='vertical-align: bottom;'>Job Name</th>\
 					<th><b>Day</b></th><th><b>Fri</b></th><th><b>Sat</b></th><th><b>Sun</b></th><th><b>Mon</b></th><th><b>Tue</b></th>\
-					<th><b>Wed</b></th><th><b>Thu</b></th><th rowspan='5' style='vertical-align: bottom;'>Total Job Hours</th></tr>"
+					<th><b>Wed</b></th><th><b>Thu</b></th><th rowspan='6' style='vertical-align: bottom;'>Total Job Hours</th></tr>"
 
 		for rec in records:
 			row = "<tr>"
+
+			index = 0
 			for r in rec:
-				row += "<td><b>%s</b></td>"%(r) if r in ["Date","Status","In Time","Out Time"] else "<td>%s</td>"%(r)
+				if index == 9:
+					row += "<td>%s</td>"%(totals.get(rec[0]))
+				else:
+					row += "<td><b>%s</b></td>"%(r) if r in ["Date","Status","In Time","Out Time","Total"] else "<td>%s</td>"%(r)
+				index += 1
 
-			row += "</tr><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>" if records.index(rec) == 2 else "</tr>"
-
-
+			row += "</tr><tr><td colspan='8'></td></tr>" if records.index(rec) == 3 else "</tr>"
 			html_code += row
+
+		# html_code += "<tr><td><b>{0}</b></td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td><td>{7}</td><td>{8}</td>\
+		# 			<td>{9}</td></tr>".format("Total",totals.get("Fri") or "",totals.get("Sat") or "",totals.get("Sun") or "",
+		# 			totals.get("Mon") or "",totals.get("Tue") or "",totals.get("Wed") or "",totals.get("Thu") or "")
 
 		self.html_code = html_code
 		return html_code

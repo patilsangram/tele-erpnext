@@ -74,29 +74,30 @@ class TimesheetReport(Document):
 		from_date = dt.strptime(self.from_date,"%Y-%m-%d")
 		for i in range(1,8):
 			date = from_date + timedelta(i-1)
-			dates[i] = date.strftime("%d-%m-%Y")
+			dates[i] = date.strftime("%d-%m-%y")
 
 		status = ['Status','Absent','Absent','Absent','Absent','Absent','Absent','Absent']
 		in_time = ['In Time','','','','','','','']
 		out_time = ['Out Time','','','','','','','']
+		att_timings = {}
 		tasks = {}
 
 		for att_record in records:
 			index = day_to_index.get(att_record.get("att_date").strftime("%a"))
-			dates[index] = att_record.get("att_date").strftime("%d-%m-%Y")
+			dates[index] = att_record.get("att_date").strftime("%d-%m-%y")
 			status[index] = att_record.get("status")
 
-			if in_time[index]:
+			if in_time[index] or (in_time[index] == timedelta(0)):
 				# compare times and choose min time as in_time
 				if in_time[index] > att_record.get("in_time"):
 					in_time[index] = att_record.get("in_time")
 			else:
 				in_time[index] = att_record.get("in_time")
 
-			if out_time[index]:
+			if out_time[index] or (out_time[index] == timedelta(0)):
 				# compare times and choose max time as in_time
-				if out_time[index] > att_record.get("out_time"):
-					in_time[index] = att_record.get("out_time")
+				if out_time[index] < att_record.get("out_time"):
+					out_time[index] = att_record.get("out_time")
 			else:
 				out_time[index] = att_record.get("out_time")
 
@@ -104,7 +105,6 @@ class TimesheetReport(Document):
 			task_template = []
 			if not tasks.get(task):
 				task_template = [task,'','','','','','','','','']
-				# task_template = [task,'','0:00:00','0:00:00','0:00:00','0:00:00','0:00:00','0:00:00','0:00:00','0:00:00']
 				task_template[9] = att_record.get("task_working_hours")
 			else:
 				task_template = tasks.get(task)
@@ -173,27 +173,26 @@ class TimesheetReport(Document):
 	def get_html_code(self,records,totals):
 		from datetime import timedelta
 
-		html_code = "<table class='table table-bordered' width=100%><tr><th rowspan='6' style='vertical-align:bottom !important'>Job Name</th>\
-					<th><b>Day</b></th><th><b>Fri</b></th><th><b>Sat</b></th><th><b>Sun</b></th><th><b>Mon</b></th><th><b>Tue</b></th>\
-					<th><b>Wed</b></th><th><b>Thu</b></th><th rowspan='6' style='vertical-align:bottom !important'>Total Job Hours</th></tr>"
+		html_code = "<table class='table table-bordered' widtd=100%><tr align='center'><td rowspan='6' style='vertical-align:bottom !important'><b>Job Name</b></td>\
+		            <td><b>Day</b></td><td><b>Fri</b></td><td><b>Sat</b></td><td><b>Sun</b></td><td><b>Mon</b></td><td><b>Tue</b></td>\
+		            <td><b>Wed</b></td><td><b>Thu</b></td><td rowspan='6' style='vertical-align:bottom !important'><b>Total Job Hours</b></td></tr>"
 
 		for rec in records:
-			row = "<tr>"
+			row = "<tr align='center'>"
 
 			index = 0
 			for r in rec:
 				if index == 9:
-					row += "<td>%s</td>"%(totals.get(rec[0]))
+					row += "<td>%s</td>"%(self.get_formatted_time(totals.get(rec[0])))
 				else:
-					row += "<td><b>%s</b></td>"%(r) if r in ["Date","Status","In Time","Out Time","Total"] else "<td>%s</td>"%(r)
+					row += "<td><b>%s</b></td>"%(r) if r in ["Date","Status","In Time","Out Time","Total"] else "<td>%s</td>"%(self.get_formatted_time(r))
 				index += 1
 
 			row += "</tr><tr><td colspan='8'></td></tr>" if records.index(rec) == 3 else "</tr>"
 			html_code += row
 
-		# html_code += "<tr><td><b>{0}</b></td><td>{1}</td><td>{2}</td><td>{3}</td><td>{4}</td><td>{5}</td><td>{6}</td><td>{7}</td><td>{8}</td>\
-		# 			<td>{9}</td></tr>".format("Total",totals.get("Fri") or "",totals.get("Sat") or "",totals.get("Sun") or "",
-		# 			totals.get("Mon") or "",totals.get("Tue") or "",totals.get("Wed") or "",totals.get("Thu") or "")
-
 		self.html_code = html_code
 		return html_code
+
+	def get_formatted_time(self,time):
+		return ":".join(str(time).split(":")[:2])

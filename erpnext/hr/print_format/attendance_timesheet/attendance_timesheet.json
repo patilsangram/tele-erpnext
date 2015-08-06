@@ -1,0 +1,16 @@
+{
+ "creation": "2015-08-06 00:15:53.840708", 
+ "custom_format": 1, 
+ "disabled": 0, 
+ "doc_type": "Timesheet Report", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "html": "{{ letter_head }} {%- if trigger_print -%}\n<script>\n    window.print();\n\n    // close the window after print\n    // NOTE: doesn't close if print is cancelled in Chrome\n    window.onfocus = function() {\n        window.close();\n    }\n</script>\n{%- endif -%}\n<br>\n<div class=\"row\">\n    <div class=\"col-xs-4\"></div>\n    <div class=\"col-xs-8\" align=\"right\">\n        <div class=\"row\">\n            <div class=\"col-xs-12\">\n                <h4 style=\"margin:0;cellpadding:0\" align=\"right\"><b>ATTENDANCE TIMESHEET</b></h4>\n            </div>\n        </div>\n        <div class=\"row\">\n            <div class=\"col-xs-12\">\n                <table class=table-bordered style=\"cellspacing:0;cellpadding:0;line-height=0.5;\">\n                    <th>Employee ID#</th>\n                    <th>Employee Name</th>\n                    <th>From Date</th>\n                    <th>To Date</th>\n                    <tr>\n                        <td>{{ doc.employee or \"\" }} </td>\n                        <td>{{ frappe.db.get_value(\"Employee\",doc.employee,\"employee_name\") }} </td>\n                        <td>{{ doc.get_formatted(\"from_date\",doc) or \"\" }}</td>\n                        <td>{{ doc.get_formatted(\"to_date\",doc) or \"\" }}</td>\n                    </tr>\n                </table>\n            </div>\n        </div>\n    </div>\n</div>\n<hr style=\"margin-top:10px\">\n<div align=\"center\"><h3>Attendance Timesheet</h3></div>\n<div class=\"row\">\n    <div class=\"col-xs-12\">{{doc.html_code}}</div>\n</div>", 
+ "modified": "2015-08-06 02:16:13.364756", 
+ "modified_by": "Administrator", 
+ "name": "Attendance Timesheet", 
+ "owner": "Administrator", 
+ "print_format_builder": 0, 
+ "print_format_type": "Server", 
+ "standard": "Yes"
+}

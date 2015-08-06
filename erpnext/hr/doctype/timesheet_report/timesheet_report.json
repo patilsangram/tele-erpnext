@@ -4,6 +4,7 @@
  "allow_rename": 0, 
  "creation": "2015-08-04 20:38:35.601931", 
  "custom": 0, 
+ "default_print_format": "", 
  "docstatus": 0, 
  "doctype": "DocType", 
  "document_type": "Master", 
@@ -59,6 +60,7 @@
    "label": "", 
    "permlevel": 0, 
    "precision": "", 
+   "print_hide": 1, 
    "read_only": 1
   }
  ], 
@@ -70,7 +72,7 @@
  "is_submittable": 0, 
  "issingle": 1, 
  "istable": 0, 
- "modified": "2015-08-05 09:25:39.626299", 
+ "modified": "2015-08-06 00:30:11.560402", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Timesheet Report", 

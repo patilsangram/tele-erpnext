@@ -191,6 +191,8 @@ class TimesheetReport(Document):
 			row += "</tr><tr><td colspan='8'></td></tr>" if records.index(rec) == 3 else "</tr>"
 			html_code += row
 
+		html_code += "<tr><td colspan='10'><b><br>Employee Signature<br><br>Checked By</b></td></tr>"
+
 		self.html_code = html_code
 		return html_code
 

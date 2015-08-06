@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
+from datetime import datetime as dt,timedelta
 
 class TimesheetReport(Document):
 	def validate(self):
@@ -34,15 +35,15 @@ class TimesheetReport(Document):
 					    `tabAttendance Time Sheet` ats
 					WHERE
 					    att.docstatus=1
-					AND att.employee='EMP/0001'
+					AND att.employee='{emp}'
 					AND (
-					        att.att_date BETWEEN '2015-08-05' AND '2015-08-05')
+					        att.att_date BETWEEN '{from_date}' AND '{to_date}')
 					AND ats.parent=att.name
 					GROUP BY
 					    ats.task,
 					    att.att_date
 					ORDER BY
-					    att.att_date DESC"""
+					    att.att_date DESC""".format(emp=self.employee, from_date=self.from_date, to_date=self.to_date)
 
 			records = frappe.db.sql(query,as_dict=True)
 			records = self.get_formatted_records(records)
@@ -52,8 +53,7 @@ class TimesheetReport(Document):
 
 	def is_valid_from_to_dates(self):
 		if self.from_date and self.to_date:
-			from datetime import datetime as dt
-
+			# from datetime import datetime as dt
 			from_date = dt.strptime(self.from_date,"%Y-%m-%d")
 			to_date = dt.strptime(self.to_date,"%Y-%m-%d")
 			date_diff = to_date - from_date
@@ -70,6 +70,12 @@ class TimesheetReport(Document):
 
 		days = ['Day','Fri','Sat','Sun','Mon','Tue','Wed','Thu']
 		dates = ["Date",'','','','','','','']
+		# setting up dates
+		from_date = dt.strptime(self.from_date,"%Y-%m-%d")
+		for i in range(1,8):
+			date = from_date + timedelta(i-1)
+			dates[i] = date.strftime("%d-%m-%Y")
+
 		status = ['Status','Absent','Absent','Absent','Absent','Absent','Absent','Absent']
 		in_time = ['In Time','','','','','','','']
 		out_time = ['Out Time','','','','','','','']
@@ -98,6 +104,7 @@ class TimesheetReport(Document):
 			task_template = []
 			if not tasks.get(task):
 				task_template = [task,'','','','','','','','','']
+				# task_template = [task,'','0:00:00','0:00:00','0:00:00','0:00:00','0:00:00','0:00:00','0:00:00','0:00:00']
 				task_template[9] = att_record.get("task_working_hours")
 			else:
 				task_template = tasks.get(task)
@@ -107,7 +114,7 @@ class TimesheetReport(Document):
 				task:task_template
 			})
 
-		timing_totals = self.store_timings_for_total(tasks)
+		timing_totals = self.calculate_timings_for_total(tasks)
 
 		timesheet_record = [dates,status,in_time,out_time]
 		[timesheet_record.append(value) for key,value in tasks.iteritems()]
@@ -120,7 +127,7 @@ class TimesheetReport(Document):
 			"timing_totals":timing_totals
 		}
 
-	def store_timings_for_total(self,tasks):
+	def calculate_timings_for_total(self,tasks):
 		from datetime import timedelta
 
 		timing_totals = {}
@@ -166,9 +173,9 @@ class TimesheetReport(Document):
 	def get_html_code(self,records,totals):
 		from datetime import timedelta
 
-		html_code = "<table class='table table-bordered' width=100%><tr><th rowspan='6' style='vertical-align: bottom;'>Job Name</th>\
+		html_code = "<table class='table table-bordered' width=100%><tr><th rowspan='6' style='vertical-align:bottom !important'>Job Name</th>\
 					<th><b>Day</b></th><th><b>Fri</b></th><th><b>Sat</b></th><th><b>Sun</b></th><th><b>Mon</b></th><th><b>Tue</b></th>\
-					<th><b>Wed</b></th><th><b>Thu</b></th><th rowspan='6' style='vertical-align: bottom;'>Total Job Hours</th></tr>"
+					<th><b>Wed</b></th><th><b>Thu</b></th><th rowspan='6' style='vertical-align:bottom !important'>Total Job Hours</th></tr>"
 
 		for rec in records:
 			row = "<tr>"

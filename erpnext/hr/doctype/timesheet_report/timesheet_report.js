@@ -1,11 +1,9 @@
-// cur_frm.cscript.onload = function(doc){
-//     setTimeout(function(){
-//         console.log("test onload")
-//     },3000)
-//     doc.employee = "";
-//     doc.from_date = "";
-//     doc.to_date = "";
-// }
+cur_frm.cscript.onload = function(doc){
+    doc.employee = "";
+    doc.from_date = "";
+    doc.to_date = "";
+    doc.html_code = "";
+}
 
 // cur_frm.cscript.employee = function(doc){
 //     // console.log(["test","onvalidate"]);

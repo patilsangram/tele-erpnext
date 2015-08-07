@@ -8,15 +8,15 @@ from frappe.model.document import Document
 from datetime import datetime as dt,timedelta
 
 class TimesheetReport(Document):
-	def onload(self):
-		now = dt.now()
-		if now.strftime("%a") == "Fri":
-			self.from_date = now.date()
-			self.to_date = now.date() + timedelta(days = 6)
-		elif now.strftime("%a") in ["Sun","Mon","Tue","Wed","Thu"]:
-			last_friday = (current_time.date() - datetime.timedelta(days=current_time.weekday()) + datetime.timedelta(days=4, weeks=-1))
-			self.from_date = last_friday
-			self.to_date = last_friday + timedelta(days = 6)
+	# def onload(self):
+	# 	now = dt.now()
+	# 	if now.strftime("%a") == "Fri":
+	# 		self.from_date = now.date()
+	# 		self.to_date = now.date() + timedelta(days = 6)
+	# 	elif now.strftime("%a") in ["Sun","Mon","Tue","Wed","Thu"]:
+	# 		last_friday = (current_time.date() - datetime.timedelta(days=current_time.weekday()) + datetime.timedelta(days=4, weeks=-1))
+	# 		self.from_date = last_friday
+	# 		self.to_date = last_friday + timedelta(days = 6)
 
 	def validate(self):
 		self.get_timesheet_report()
@@ -209,17 +209,20 @@ class TimesheetReport(Document):
 	def get_formatted_time(self,time):
 		return ":".join(str(time).split(":")[:2])
 
-		# if isinstance(time,timedelta):
-		# 	if time.total_seconds() < 86400:
-		# 		return ":".join(str(time).split(":")[:2])
-		# 	else:
-		# 		seconds = time.total_seconds()
-		# 		hours = seconds / 3600
-		# 		minutes = (seconds % 3600) / 60
-		#
-		# 		_min = int(minutes)
-		# 		_min = "{0}0".format(_min) if len(str(_min)) == 1 else str(_min)
-		#
-		# 		return "{0}:{1}".format(int(hours),_min)
-		# else:
-		# 	return ":".join(str(time).split(":")[:2])
+@frappe.whitelist()
+def get_from_to_dates():
+	now = dt.now()
+	from_date, to_date = now.date(), now.date()
+
+	if now.strftime("%a") == "Fri":
+		from_date = now.date()
+		to_date = now.date() + timedelta(days = 6)
+	elif now.strftime("%a") in ["Sun","Mon","Tue","Wed","Thu"]:
+		last_friday = (current_time.date() - datetime.timedelta(days=current_time.weekday()) + datetime.timedelta(days=4, weeks=-1))
+		from_date = last_friday
+		to_date = last_friday + timedelta(days = 6)
+
+	return {
+		"from_date":from_date,
+		"to_date":to_date
+	}

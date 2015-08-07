@@ -113,19 +113,25 @@ class Attendance(Document):
 	def validate_task_details(self):
 		"""
 			validate the in time and out time
+			0. Check Attendance status
 			1. In time can not be greater than out time_sheet_records
 			2. In time of next record must be greater than out time of previous record
 		"""
-		records = self.task_details
+		if self.status == "Absent":
+			self.task_details = {}
+		else:
+			records = self.task_details
 
-		for i in range(0,len(records)):
-			rec_1 = self.unicode_to_timedelta(records[i].in_time, records[i].out_time)
+			for i in range(0,len(records)):
+				rec_1 = self.unicode_to_timedelta(records[i].in_time, records[i].out_time)
 
-			if rec_1["in_time"] > rec_1["out_time"]:
-				frappe.throw("In Time should be less than Out Time for record : {0}".format(records[i].idx))
+				if rec_1["in_time"] == rec_1["out_time"]:
+					frappe.throw("In Time & Out Time can not be same")
+				elif rec_1["in_time"] > rec_1["out_time"]:
+					frappe.throw("In Time should be less than Out Time for record : {0}".format(records[i].idx))
 
-			if i+1 < len(records):
-				rec_2 = self.unicode_to_timedelta(records[i+1].in_time, records[i+1].out_time)
+				if i+1 < len(records):
+					rec_2 = self.unicode_to_timedelta(records[i+1].in_time, records[i+1].out_time)
 
-				if rec_2["in_time"] < rec_1["out_time"]:
-					frappe.throw("In Time of record {0} should be greater than Out Time of record {1}".format(records[i+1].idx, records[i].idx,))
+					if rec_2["in_time"] < rec_1["out_time"]:
+						frappe.throw("In Time of record {0} should be greater than Out Time of record {1}".format(records[i+1].idx, records[i].idx,))

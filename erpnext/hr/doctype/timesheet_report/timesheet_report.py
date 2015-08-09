@@ -53,10 +53,11 @@ class TimesheetReport(Document):
 					    ats.task,
 					    att.att_date
 					ORDER BY
-					    att.att_date DESC""".format(emp=self.employee, from_date=self.from_date, to_date=self.to_date)
+					    att.att_date DESC, ats.idx ASC""".format(emp=self.employee, from_date=self.from_date, to_date=self.to_date)
 
 			records = frappe.db.sql(query,as_dict=True)
 			records = self.get_formatted_records(records)
+			# frappe.errprint(records)
 			timesheet_html_report = self.get_html_code(records.get("timesheet_record"), records.get("timing_totals"))
 
 		# return timesheet_html_report
@@ -92,7 +93,10 @@ class TimesheetReport(Document):
 		att_timings = {}
 		tasks = {}
 
+		ordered_tasks = []
+
 		for att_record in records:
+			# frappe.errprint(att_record)
 			index = day_to_index.get(att_record.get("att_date").strftime("%a"))
 			dates[index] = att_record.get("att_date").strftime("%d-%m-%y")
 			status[index] = att_record.get("status")
@@ -123,11 +127,14 @@ class TimesheetReport(Document):
 			tasks.update({
 				task:task_template
 			})
+			if task not in ordered_tasks: ordered_tasks.append(task)
+			# frappe.errprint(ordered_tasks)
 
 		timing_totals = self.calculate_timings_for_total(tasks)
 
 		timesheet_record = [dates,status,in_time,out_time]
-		[timesheet_record.append(value) for key,value in tasks.iteritems()]
+		# [timesheet_record.append(value) for key,value in tasks.iteritems()]
+		[timesheet_record.append(tasks.get(key)) for key in ordered_tasks]
 
 		totals_row = self.get_totals_row(timing_totals)
 		timesheet_record.append(totals_row)
@@ -218,7 +225,8 @@ def get_from_to_dates():
 		from_date = now.date()
 		to_date = now.date() + timedelta(days = 6)
 	elif now.strftime("%a") in ["Sun","Mon","Tue","Wed","Thu"]:
-		last_friday = (current_time.date() - datetime.timedelta(days=current_time.weekday()) + datetime.timedelta(days=4, weeks=-1))
+		weeks = 0 if now.strftime("%a") == "Sun" else -1
+		last_friday = (now.date() - timedelta(days=now.weekday()) + timedelta(days=4, weeks=weeks))
 		from_date = last_friday
 		to_date = last_friday + timedelta(days = 6)
 

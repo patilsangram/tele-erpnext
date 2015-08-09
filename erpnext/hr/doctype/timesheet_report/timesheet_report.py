@@ -8,16 +8,6 @@ from frappe.model.document import Document
 from datetime import datetime as dt,timedelta
 
 class TimesheetReport(Document):
-	# def onload(self):
-	# 	now = dt.now()
-	# 	if now.strftime("%a") == "Fri":
-	# 		self.from_date = now.date()
-	# 		self.to_date = now.date() + timedelta(days = 6)
-	# 	elif now.strftime("%a") in ["Sun","Mon","Tue","Wed","Thu"]:
-	# 		last_friday = (current_time.date() - datetime.timedelta(days=current_time.weekday()) + datetime.timedelta(days=4, weeks=-1))
-	# 		self.from_date = last_friday
-	# 		self.to_date = last_friday + timedelta(days = 6)
-
 	def validate(self):
 		self.get_timesheet_report()
 
@@ -57,14 +47,10 @@ class TimesheetReport(Document):
 
 			records = frappe.db.sql(query,as_dict=True)
 			records = self.get_formatted_records(records)
-			# frappe.errprint(records)
 			timesheet_html_report = self.get_html_code(records.get("timesheet_record"), records.get("timing_totals"))
-
-		# return timesheet_html_report
 
 	def is_valid_from_to_dates(self):
 		if self.from_date and self.to_date:
-			# from datetime import datetime as dt
 			from_date = dt.strptime(self.from_date,"%Y-%m-%d")
 			to_date = dt.strptime(self.to_date,"%Y-%m-%d")
 			date_diff = to_date - from_date
@@ -90,16 +76,17 @@ class TimesheetReport(Document):
 		status = ['Status','Absent','Absent','Absent','Absent','Absent','Absent','Absent']
 		in_time = ['In Time','','','','','','','']
 		out_time = ['Out Time','','','','','','','']
+		day_totals = ['Total','','','','','','','','','']
 		att_timings = {}
 		tasks = {}
 
 		ordered_tasks = []
 
 		for att_record in records:
-			# frappe.errprint(att_record)
 			index = day_to_index.get(att_record.get("att_date").strftime("%a"))
 			dates[index] = att_record.get("att_date").strftime("%d-%m-%y")
 			status[index] = att_record.get("status")
+			day_totals[index + 1] = att_record.get("day_working_hours")
 
 			if in_time[index] or (in_time[index] == timedelta(0)):
 				# compare times and choose min time as in_time
@@ -118,6 +105,7 @@ class TimesheetReport(Document):
 			task = att_record.get("task")
 			task_template = []
 			if not tasks.get(task):
+				# task_template = [task,'','','','','','','','','']
 				task_template = [task,'','','','','','','','','']
 				task_template[9] = att_record.get("task_working_hours")
 			else:
@@ -128,64 +116,25 @@ class TimesheetReport(Document):
 				task:task_template
 			})
 			if task not in ordered_tasks: ordered_tasks.append(task)
-			# frappe.errprint(ordered_tasks)
-
-		timing_totals = self.calculate_timings_for_total(tasks)
 
 		timesheet_record = [dates,status,in_time,out_time]
-		# [timesheet_record.append(value) for key,value in tasks.iteritems()]
 		[timesheet_record.append(tasks.get(key)) for key in ordered_tasks]
 
-		totals_row = self.get_totals_row(timing_totals)
-		timesheet_record.append(totals_row)
+		day_totals[9] = self.get_timing_totals(day_totals)
+		timesheet_record.append(day_totals)
 
 		return {
 			"timesheet_record":timesheet_record,
-			"timing_totals":timing_totals
+			"timing_totals":day_totals
 		}
 
-	def calculate_timings_for_total(self,tasks):
-		from datetime import timedelta
-
-		timing_totals = {}
-		index_to_day={1:'Fri',2:'Sat',3:'Sun',4:'Mon',5:'Tue',6:'Wed',7:'Thu'}
-
-		for key,task in tasks.iteritems():
-			task_total_time = timedelta(0)
-			c = 0
-			for rec in task:
-				i = task.index(rec)
-				if isinstance(rec,timedelta) and (c != 9):
-					day = index_to_day.get(i)
-					# calculating total time spent on task
-					task_total_time += rec
-					# calculating total time spent on day
-					day_total_time = ""
-					if not timing_totals.get(day):
-						day_total_time = task[i]
-					else:
-						day_total_time = timing_totals.get(day) + task[i]
-
-					timing_totals.update({
-						day:day_total_time,
-						key:task_total_time
-					})
-				c = c+1
-		return timing_totals
-
-	def get_totals_row(self,totals):
-		from datetime import timedelta
-		index_to_day={1:'Fri',2:'Sat',3:'Sun',4:'Mon',5:'Tue',6:'Wed',7:'Thu'}
-		last_row = ["Total",'','','','','','','','','']
-		total = timedelta(0)
-		for i in range(2,9):
-			if totals.get(index_to_day.get(i)):
-				last_row[i] = totals.get(index_to_day.get(i))
-				total += totals.get(index_to_day.get(i))
-		totals.update({
-			"Total":total
-		})
-		return last_row
+	def get_timing_totals(self,totals):
+		total = timedelta(0,0)
+		# check calculate the total timing
+		for time in totals:
+			if isinstance(time,timedelta):
+				total += time
+		return total
 
 	def get_html_code(self,records,totals):
 		from datetime import timedelta
@@ -199,10 +148,7 @@ class TimesheetReport(Document):
 
 			index = 0
 			for r in rec:
-				if index == 9:
-					row += "<td>%s</td>"%(self.get_formatted_time(totals.get(rec[0])))
-				else:
-					row += "<td><b>%s</b></td>"%(r) if r in ["Date","Status","In Time","Out Time","Total"] else "<td>%s</td>"%(self.get_formatted_time(r))
+				row += "<td><b>%s</b></td>"%(r) if r in ["Date","Status","In Time","Out Time","Total"] else "<td>%s</td>"%(self.get_formatted_time(r))
 				index += 1
 
 			row += "</tr><tr><td colspan='8'></td></tr>" if records.index(rec) == 3 else "</tr>"

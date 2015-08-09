@@ -150,7 +150,7 @@
   }, 
   {
    "fieldname": "working_hours", 
-   "fieldtype": "Data", 
+   "fieldtype": "Time", 
    "label": "Working Hours", 
    "permlevel": 0, 
    "precision": "", 
@@ -164,7 +164,7 @@
   }, 
   {
    "fieldname": "break_time", 
-   "fieldtype": "Data", 
+   "fieldtype": "Time", 
    "label": "Break Time", 
    "permlevel": 0, 
    "precision": "", 
@@ -174,7 +174,7 @@
  "icon": "icon-ok", 
  "idx": 1, 
  "is_submittable": 1, 
- "modified": "2015-06-09 21:54:36.322700", 
+ "modified": "2015-08-10 01:01:12.942232", 
  "modified_by": "Administrator", 
  "module": "HR", 
  "name": "Attendance", 

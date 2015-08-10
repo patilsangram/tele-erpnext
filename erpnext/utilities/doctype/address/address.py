@@ -10,7 +10,7 @@ from frappe.utils import cstr
 from frappe.model.document import Document
 from frappe.model.naming import make_autoname
 
-class Address(Document):	
+class Address(Document):
 	def autoname(self):
 		if(self.customer):
 			abbr = frappe.db.get_value("Customer",self.customer,"abbr")
@@ -61,7 +61,7 @@ class Address(Document):
 	def validate_new_name(self,new, abbr):
 		db_current = frappe.db.get_value("Series",abbr[0].get('abbr'), "current")
 		new_current = int(new.split('-')[1])
-		if db_current == new_current: 
+		if db_current == new_current:
 			return true
 		else:
 			frappe.throw("The series for new name should be %s" %(db_current+1))
@@ -72,7 +72,7 @@ def get_address_display(address_dict):
 		return
 	if not isinstance(address_dict, dict):
 		address_dict = frappe.db.get_value("Address", address_dict, "*", as_dict=True) or {}
-	
+
 	template = frappe.db.get_value("Address Template", \
 		{"country": address_dict.get("country")}, "template")
 	if not template:

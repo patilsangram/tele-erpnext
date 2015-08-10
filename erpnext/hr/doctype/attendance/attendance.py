@@ -66,9 +66,10 @@ class Attendance(Document):
 		time_sheet_records = self.task_details
 
 		hours = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-		
+
 		for record in time_sheet_records:
 			rec = self.unicode_to_timedelta(record.in_time, record.out_time)
+			record.working_hours = ( rec["out_time"] - rec["in_time"] )
 			hours += ( rec["out_time"] - rec["in_time"] )
 
 		return hours
@@ -78,16 +79,16 @@ class Attendance(Document):
 			calculate the total break time in Hours
 		"""
 		time_sheet_records = self.task_details
-		
+
 		break_time = dt.timedelta(hours = 0, minutes = 0, seconds = 0)
-		
+
 		for i in range(0,len(time_sheet_records)):
 			if i+1 < len(time_sheet_records):
 				rec_1 = self.unicode_to_timedelta(time_sheet_records[i].in_time, time_sheet_records[i].out_time)
 				rec_2 = self.unicode_to_timedelta(time_sheet_records[i+1].in_time, time_sheet_records[i+1].out_time)
 
 				break_time += ( rec_2["in_time"] - rec_1["out_time"] )
-				
+
 		return break_time
 
 	def unicode_to_timedelta(self,in_time, out_time):
@@ -112,19 +113,25 @@ class Attendance(Document):
 	def validate_task_details(self):
 		"""
 			validate the in time and out time
+			0. Check Attendance status
 			1. In time can not be greater than out time_sheet_records
 			2. In time of next record must be greater than out time of previous record
 		"""
-		records = self.task_details
+		if self.status == "Absent":
+			self.task_details = {}
+		else:
+			records = self.task_details
 
-		for i in range(0,len(records)):
-			rec_1 = self.unicode_to_timedelta(records[i].in_time, records[i].out_time)
+			for i in range(0,len(records)):
+				rec_1 = self.unicode_to_timedelta(records[i].in_time, records[i].out_time)
 
-			if rec_1["in_time"] > rec_1["out_time"]:
-				frappe.throw("In Time should be less than Out Time for record : {0}".format(records[i].idx))
+				if rec_1["in_time"] == rec_1["out_time"]:
+					frappe.throw("In Time & Out Time can not be same")
+				elif rec_1["in_time"] > rec_1["out_time"]:
+					frappe.throw("In Time should be less than Out Time for record : {0}".format(records[i].idx))
 
-			if i+1 < len(records):
-				rec_2 = self.unicode_to_timedelta(records[i+1].in_time, records[i+1].out_time)
+				if i+1 < len(records):
+					rec_2 = self.unicode_to_timedelta(records[i+1].in_time, records[i+1].out_time)
 
-				if rec_2["in_time"] < rec_1["out_time"]:
-					frappe.throw("In Time of record {0} should be greater than Out Time of record {1}".format(records[i+1].idx, records[i].idx,))
+					if rec_2["in_time"] < rec_1["out_time"]:
+						frappe.throw("In Time of record {0} should be greater than Out Time of record {1}".format(records[i+1].idx, records[i].idx,))

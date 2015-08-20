@@ -21,6 +21,7 @@ class Issue(Document):
 			self.raised_by = frappe.session.user
 		self.update_status()
 		self.set_lead_contact(self.raised_by)
+		self.validate_due_date()
 
 		# set contact name if not set
 		# if self.contact != "" and not self.contact_name:
@@ -57,6 +58,11 @@ class Issue(Document):
 		if self.status=="Open" and status !="Open":
 			# if no date, it should be set as None and not a blank string "", as per mysql strict config
 			self.resolution_date = None
+
+	def validate_due_date(self):
+		if self.due_date:
+			if (self.due_date < self.opening_date) and (self.due_date < now()):
+				frappe.throw("Due Date can not be date in past")
 
 def get_list_context(context=None):
 	return {

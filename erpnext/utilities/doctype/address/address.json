@@ -23,6 +23,14 @@
    "reqd": 0
   }, 
   {
+   "depends_on": "eval:doc.customer", 
+   "fieldname": "location_name", 
+   "fieldtype": "Data", 
+   "label": "Location Name", 
+   "permlevel": 0, 
+   "precision": ""
+  }, 
+  {
    "fieldname": "location_id", 
    "fieldtype": "Data", 
    "label": "Location ID", 
@@ -207,7 +215,7 @@
  "icon": "icon-map-marker", 
  "idx": 1, 
  "in_dialog": 0, 
- "modified": "2015-07-28 00:48:40.567873", 
+ "modified": "2015-08-20 12:25:15.858183", 
  "modified_by": "Administrator", 
  "module": "Utilities", 
  "name": "Address", 
@@ -270,7 +278,7 @@
    "write": 1
   }
  ], 
- "search_fields": "customer, supplier, sales_partner, country, state", 
+ "search_fields": "customer, supplier, sales_partner, country, state, location_id", 
  "sort_field": "modified", 
  "sort_order": "DESC"
 }

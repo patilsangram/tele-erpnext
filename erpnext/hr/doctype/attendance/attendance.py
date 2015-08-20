@@ -98,11 +98,13 @@ class Attendance(Document):
 		# 	})
 
 		if isinstance(in_time, unicode) and isinstance(out_time, unicode):
+			# validate_date_format([in_time,out_time])
+			validate_date_format({"In Time":in_time,"Out Time":out_time})
 			_in = in_time.split(":")
 			_out = out_time.split(":")
 			return {
-				"in_time":dt.timedelta(hours = int(_in[0]), minutes = int(_in[1]), seconds = int(_in[2])),
-				"out_time":dt.timedelta(hours = int(_out[0]), minutes = int(_out[1]), seconds = int(_out[2]))
+				"in_time":dt.timedelta(hours = int(_in[0]), minutes = int(_in[1]), seconds = int(_in[2]) if len(_in) == 3 else 0),
+				"out_time":dt.timedelta(hours = int(_out[0]), minutes = int(_out[1]), seconds = int(_out[2]) if len(_out) == 3 else 0)
 			}
 		else:
 			return {
@@ -135,3 +137,22 @@ class Attendance(Document):
 
 					if rec_2["in_time"] < rec_1["out_time"]:
 						frappe.throw("In Time of record {0} should be greater than Out Time of record {1}".format(records[i+1].idx, records[i].idx,))
+
+def validate_date_format(_time=None):
+	for field, time in _time.iteritems():
+		tm_list = time.split(":")
+		hours = 0
+		minutes = 0
+		seconds = 0
+
+		if (len(tm_list) == 3) or (len(tm_list) == 2):
+			hours, minutes = int(tm_list[0]), int(tm_list[1])
+			seconds = 0 if len(tm_list) == 2 else int(tm_list[2])
+			if not (hours >=0 and hours <=23):
+				frappe.throw("Invalid hours value in '%s' field"%(field))
+			elif not (minutes >= 0 and minutes <= 59):
+				frappe.throw("Invalid minutes value in '%s' field"%(field))
+			elif not (seconds >= 0 and seconds <= 59):
+				frappe.throw("Invalid seconds value  in '%s' field"%(field))
+		else:
+			frappe.throw("Invalid time format please input time in HH:MM:SS or HH:MM format")

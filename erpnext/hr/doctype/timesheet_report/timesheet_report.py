@@ -132,10 +132,10 @@ class TimesheetReport(Document):
 		total = timedelta(0,0)
 		# check calculate the total timing
 		for time in totals:
-			
+
 			if isinstance(time,timedelta):
 				total += time
-		
+
 		return str(total.days*24 + total.seconds//3600) + " : " + str((total.seconds//60)%60)
 
 	def get_html_code(self,records,totals):

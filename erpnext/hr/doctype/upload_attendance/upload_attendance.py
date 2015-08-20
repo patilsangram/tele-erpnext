@@ -47,7 +47,7 @@ def add_data(w, args):
 	dates = get_dates(args)
 	employees = get_active_employees()
 	existing_attendance_records = get_existing_attendance_records(args)
-	
+
 	for date in dates:
 		for employee in employees:
 			existing_attendance = {}
@@ -60,7 +60,7 @@ def add_data(w, args):
 					row = get_row(i, existing_attendance, employee, date);
 					w.writerow(row)
 			else:
-				row = get_row(0, None, employee, date)				
+				row = get_row(0, None, employee, date)
 				w.writerow(row)
 	return w
 
@@ -69,10 +69,10 @@ def get_row(i, record, employee, date):
 	return [
 		i == 0 and record and record.name or "",
 		i == 0 and employee.name or "",
-		i == 0 and employee.employee_name or "", 
+		i == 0 and employee.employee_name or "",
 		i == 0 and date or "",
 		i == 0 and record and record.status or "",
-		i == 0 and get_fiscal_year(date)[0] or "", 
+		i == 0 and get_fiscal_year(date)[0] or "",
 		i == 0 and employee.company or "",
 		i == 0 and record and record.naming_series or get_naming_series(),
 		record and record["task_details"][i]["task_record_id"] or "",
@@ -94,29 +94,29 @@ def get_active_employees():
 	return employees
 
 def get_existing_attendance_records(args):
-	attendance = frappe.db.sql("""SELECT 
-									att.name, 
-									att.att_date, 
-									att.employee, 
-									att.status, 
+	attendance = frappe.db.sql("""SELECT
+									att.name,
+									att.att_date,
+									att.employee,
+									att.status,
 									att.naming_series,
-									ats.name AS task_record_id, 
-									ats.task, 
-									ats.in_time, 
-									ats.out_time, 
-									ats.description 
-								FROM 
-									`tabAttendance` att, 
-									`tabAttendance Time Sheet` ats 
-								WHERE 
-									ats.parent = att.name 
-									AND 
-									att.att_date between %s and %s 
+									ats.name AS task_record_id,
+									ats.task,
+									ats.in_time,
+									ats.out_time,
+									ats.description
+								FROM
+									`tabAttendance` att,
+									`tabAttendance Time Sheet` ats
+								WHERE
+									ats.parent = att.name
+									AND
+									att.att_date between %s and %s
 									AND att.docstatus < 2 ORDER BY att.att_date ASC""",(args["from_date"], args["to_date"]), as_dict=1)
 
 	existing_attendance = {}
 	att_id = []
-	
+
 	for att in attendance:
 		task_details = []
 		if att.name not in att_id:
@@ -169,7 +169,7 @@ def upload():
 		if not row: continue
 		row_idx = i + 5
 		d = frappe._dict(zip(columns, row))
-		
+
 		d["doctype"] = "Attendance"
 		if d.name:
 			d["docstatus"] = frappe.db.get_value("Attendance", d.name, "docstatus")
@@ -183,7 +183,7 @@ def upload():
 
 				task_details = []
 				task_details.append(get_child_entries(att_id,row))
-				
+
 				child_entries.update({
 					att_id:task_details
 					})
@@ -209,8 +209,10 @@ def get_child_entries(att_id, row):
 		"name": row[8],
 		"parent": att_id,
 		"task": row[9],
-		"in_time": dt.datetime.strptime(row[10], '%H:%M:%S'),
-		"out_time": dt.datetime.strptime(row[11], '%H:%M:%S'),
+		# "in_time": dt.datetime.strptime(row[10], '%H:%M:%S'),
+		# "out_time": dt.datetime.strptime(row[11], '%H:%M:%S'),
+		"in_time": row[10],
+		"out_time": row[11],
 		"description":row[12]
 	}
 

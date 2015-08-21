@@ -42,6 +42,16 @@
    "read_only": 0
   }, 
   {
+   "depends_on": "", 
+   "fieldname": "location_name", 
+   "fieldtype": "Read Only", 
+   "label": "Location Name", 
+   "options": "location_id.location_name", 
+   "permlevel": 0, 
+   "precision": "", 
+   "read_only": 1
+  }, 
+  {
    "fieldname": "cb00", 
    "fieldtype": "Column Break", 
    "permlevel": 0
@@ -209,7 +219,7 @@
  "idx": 1, 
  "in_create": 0, 
  "in_dialog": 0, 
- "modified": "2015-06-25 20:43:29.859228", 
+ "modified": "2015-08-20 12:27:24.381349", 
  "modified_by": "Administrator", 
  "module": "Utilities", 
  "name": "Contact", 

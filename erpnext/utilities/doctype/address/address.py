@@ -107,7 +107,7 @@ def get_customer_addresses(doctype, txt, searchfield, start, page_len, filters):
 	else:
 		condition = "customer<>''"
 
-	return frappe.db.sql("""select name from tabAddress where %s"""%condition)
+	return frappe.db.sql("""select name from tabAddress where name like '%(txt)s' and %(cond)s"""%{"cond":condition, 'txt': "%%%s%%" % txt})
 
 def get_list_context(context=None):
 	from erpnext.shopping_cart.cart import get_address_docs

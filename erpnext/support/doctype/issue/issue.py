@@ -61,7 +61,7 @@ class Issue(Document):
 
 	def validate_due_date(self):
 		if self.due_date:
-			if (self.due_date < self.opening_date) and (self.due_date < now()):
+			if (self.due_date < self.opening_date):
 				frappe.throw("Due Date can not be date in past")
 
 def get_list_context(context=None):

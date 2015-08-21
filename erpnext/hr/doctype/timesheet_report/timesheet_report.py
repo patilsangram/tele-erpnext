@@ -136,7 +136,7 @@ class TimesheetReport(Document):
 			if isinstance(time,timedelta):
 				total += time
 
-		return str(total.days*24 + total.seconds//3600) + " : " + str((total.seconds//60)%60)
+		return str(total.days*24 + total.seconds//3600) + ":" + str((total.seconds//60)%60)
 
 	def get_html_code(self,records,totals):
 		from datetime import timedelta
@@ -162,7 +162,12 @@ class TimesheetReport(Document):
 		return html_code
 
 	def get_formatted_time(self,time):
-		return ":".join(str(time).split(":")[:2])
+		# return ":".join(str(time).split(":")[:2])
+		hr_mn = []
+		for tm in str(time).split(":")[:2]:
+			hr_mn.append("0%s"%(tm) if len(tm) == 1 else tm)
+		return ":".join(hr_mn)
+
 
 @frappe.whitelist()
 def get_from_to_dates():

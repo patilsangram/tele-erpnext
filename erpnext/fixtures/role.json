@@ -2,6 +2,20 @@
  {
   "docstatus": 0, 
   "doctype": "Role", 
+  "modified": "2015-07-30 02:22:07.658983", 
+  "name": "_Test Role", 
+  "role_name": "_Test Role"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Role", 
+  "modified": "2015-07-30 02:22:07.661189", 
+  "name": "_Test Role 2", 
+  "role_name": "_Test Role 2"
+ }, 
+ {
+  "docstatus": 0, 
+  "doctype": "Role", 
   "modified": "2015-05-20 19:12:20.525206", 
   "name": "System Manager", 
   "role_name": "System Manager"

@@ -96,7 +96,7 @@ scheduler_events = {
 
 default_mail_footer = """<div style="padding: 15px; text-align: center;">
 	<a href="https://erpnext.com?source=via_email_footer" target="_blank" style="color: #8d99a6;">
-		Sent via ERPNext
+		Sent via www.telecom-advocates.com/
 	</a>
 </div>"""
 
@@ -105,4 +105,4 @@ get_translated_dict = {
 	("doctype", "Global Defaults"): "frappe.geo.country_info.get_translated_dict"
 }
 
-fixtures = ["Role"]
+fixtures = ["Role", "Custom Field"]

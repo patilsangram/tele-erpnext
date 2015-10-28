@@ -75,6 +75,9 @@ doc_events = {
 	"Price List": {
 		"on_update": "erpnext.shopping_cart.doctype.shopping_cart_settings.shopping_cart_settings.validate_cart_settings"
 	},
+	"ToDo": {
+		"before_insert": "erpnext.support.notifications.new_support_queue_notification"
+	}
 }
 
 scheduler_events = {
@@ -84,7 +87,10 @@ scheduler_events = {
 		"erpnext.setup.doctype.email_digest.email_digest.send",
 		"erpnext.support.doctype.issue.issue.auto_close_tickets",
 		"erpnext.accounts.doctype.fiscal_year.fiscal_year.auto_create_fiscal_year",
-		"erpnext.hr.doctype.employee.employee.send_birthday_reminders"
+		"erpnext.hr.doctype.employee.employee.send_birthday_reminders",
+		"erpnext.support.notifications.notify_user_about_due_issues",
+		"erpnext.support.notifications.notify_user_about_past_due_issues",
+		"erpnext.support.notifications.notify_customer_about_open_issues"
 	],
 	"daily_long": [
 		"erpnext.setup.doctype.backup_manager.backup_manager.take_backups_daily"

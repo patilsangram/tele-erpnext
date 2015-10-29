@@ -96,32 +96,49 @@ def notify_customer_about_open_issues():
     from datetime import datetime, timedelta
 
     today = frappe.utils.now_datetime().date()
-    query = """ SELECT DISTINCT name FROM `tabIssue` WHERE status='Open'
+    query = """ SELECT DISTINCT name, raised_by FROM `tabIssue` WHERE status='Open'
                 AND opening_date < '%s'"""%(today)
     issues = frappe.db.sql(query, as_list=True)
     if issues:
-        users = {}
-        names = ["'%s'"%issue[0] for issue in issues]
-        query = """ SELECT owner, reference_name FROM `tabToDo`
-                    WHERE reference_name in (%s) AND reference_type='Issue'
-                    AND status='Open'"""%(",".join(names))
-        results = frappe.db.sql(query, as_list=True)
-        for result in results:
-            issue = users.get(result[0]) if users.get(result[0]) else []
-            issue.append(result[1])
-            users.update({result[0]:issue})
+        cust_details = {}
+        for issue in issues:
+            email = issue[1]
+            dn = [] if not cust_details.get(email) else cust_details.get(email)
+            dn.append(issue[0])
+            cust_details.update({email:dn})
 
-        for user, issues in users.iteritems():
-            user_details = frappe.db.get_value("User", user, ["email", "first_name", "middle_name", "last_name"])
-            if user_details:
-                args = {
-                    "email": user_details[0],
-                    "full_name": " ".join([txt for txt in user_details[1:] if txt]),
-                    "subject": "Past due date Support Tickets",
-                    "title": "Support Ticket updates",
-                    "msg": "Following support ticket has extended its due date<br>%s<br>Please address the issue and close the ticket."%(get_issue_due_dates_table(issues))
-                }
-                send_mail(args)
+        for email, doc_names in cust_details.iteritems():
+            args = {
+                "email": email,
+                "full_name": "Customer",
+                "subject": "Telecom Advocate Support Ticket Updates",
+                "title": "Telecom Advocate Support Ticket Updates",
+                "msg": "Support Ticket%s %s %s created against the issue reported by you.<br>You will hear from us soon."%(
+                            "s" if len(doc_names) > 1 else "",
+                            ",".join(doc_names),
+                            "are" if len(doc_names) > 1 else "is"
+                        )
+            }
+            send_mail(args)
+
+def notify_user_about_closed_ticket(doc, method):
+    print "notify_user_about_closed_ticket"
+    if not doc.is_billing_mail_sent and doc.status == "Closed" and doc.billing_status == "Not Completed":
+        print "test"
+        doc.billing_status = "Billing"
+        args = {
+            "email": doc.raised_by,
+            "full_name": doc.customer_name or "Customer",
+            "subject": "Support Ticket is resolved and closed",
+            "title": "Support Ticket updates",
+            "msg": "Your Support ticket %s is resolved and closed.<br>Kindly process the billing."%(
+                        doc.name
+                    )
+        }
+        print args
+        send_mail(args)
+    else:
+        pass
 
 def send_mail(args):
     """send mail to user"""
@@ -130,8 +147,8 @@ def send_mail(args):
     try:
         sender = None
         template = "templates/emails/notification_template.html"
-        frappe.sendmail(recipients=args.get("email"), sender=sender, subject=args.get("subject"),
-            message=frappe.get_template(template).render(args))
+        # frappe.sendmail(recipients=args.get("email"), sender=sender, subject=args.get("subject"),
+        #     message=frappe.get_template(template).render(args))
         # frappe.sendmail(recipients="makarand.b@indictranstech.com", sender=sender, subject=args.get("subject"),
         #     message=frappe.get_template(template).render(args))
         print frappe.get_template(template).render(args)

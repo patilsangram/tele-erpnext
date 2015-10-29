@@ -77,6 +77,9 @@ doc_events = {
 	},
 	"ToDo": {
 		"before_insert": "erpnext.support.notifications.new_support_queue_notification"
+	},
+	"Issue": {
+		"validate": "erpnext.support.notifications.notify_user_about_closed_ticket"
 	}
 }
 

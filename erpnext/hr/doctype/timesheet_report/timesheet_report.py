@@ -164,7 +164,7 @@ class TimesheetReport(Document):
 	def get_formatted_time(self,time):
 		# return ":".join(str(time).split(":")[:2])
 		hr_mn = []
-		for tm in str(time).split(":")[:2]:
+		for tm in unicode(time).split(":")[:2]:
 			hr_mn.append("0%s"%(tm) if len(tm) == 1 else tm)
 		return ":".join(hr_mn)
 

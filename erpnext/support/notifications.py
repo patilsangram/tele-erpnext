@@ -30,7 +30,6 @@ def notify_user_about_due_issues():
                     WHERE reference_name in (%s) AND reference_type='Issue'
                     AND status='Open'"""%(",".join(names))
         results = frappe.db.sql(query, as_list=True)
-        print results
         # [users.update({r[0]:users.get(r[0]).append(r[1]) if users.get(r[0]) else r[1:]}) for r in result]
         for result in results:
             issue = users.get(result[0]) if users.get(result[0]) else []
@@ -122,9 +121,7 @@ def notify_customer_about_open_issues():
             send_mail(args)
 
 def notify_user_about_closed_ticket(doc, method):
-    print "notify_user_about_closed_ticket"
     if not doc.is_billing_mail_sent and doc.status == "Closed" and doc.billing_status == "Not Completed":
-        print "test"
         doc.billing_status = "Billing"
         args = {
             "email": doc.raised_by,
@@ -135,7 +132,6 @@ def notify_user_about_closed_ticket(doc, method):
                         doc.name
                     )
         }
-        print args
         send_mail(args)
     else:
         pass
@@ -147,11 +143,8 @@ def send_mail(args):
     try:
         sender = None
         template = "templates/emails/notification_template.html"
-        # frappe.sendmail(recipients=args.get("email"), sender=sender, subject=args.get("subject"),
-        #     message=frappe.get_template(template).render(args))
-        # frappe.sendmail(recipients="makarand.b@indictranstech.com", sender=sender, subject=args.get("subject"),
-        #     message=frappe.get_template(template).render(args))
-        print frappe.get_template(template).render(args)
+        frappe.sendmail(recipients=args.get("email"), sender=sender, subject=args.get("subject"),
+            message=frappe.get_template(template).render(args))
         return True
     except Exception, e:
         import traceback

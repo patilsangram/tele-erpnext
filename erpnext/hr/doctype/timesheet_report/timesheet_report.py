@@ -58,9 +58,9 @@ class TimesheetReport(Document):
 			if (from_date.strftime("%a") == "Fri") and (to_date.strftime("%a") == "Thu") and (date_diff.days == 6):
 				return True
 			else:
-				frappe.throw("Invalid From Date and To Date")
+				raise frappe.ValidationError("Invalid From Date and To Date")
 		else:
-			frappe.throw("From Date and To Date fields are mandatory")
+			raise frappe.MandatoryError("From Date and To Date fields are mandatory")
 
 	def get_formatted_records(self,records):
 		day_to_index={'Fri':1,'Sat':2,'Sun':3,'Mon':4,'Tue':5,'Wed':6,'Thu':7}

@@ -9,7 +9,8 @@ def new_support_queue_notification(doc, method):
         args = {
             "email": user_details[0],
             "full_name": " ".join([txt for txt in user_details[1:] if txt]),
-            "subject": "Support Ticket is assigned to you",
+            #"subject": "Support Ticket is assigned to you",
+            "subject": doc.subject,
             "title": "Support Ticket updates",
             "msg": "Please note a new Support Ticket '{0} - {1}' has been assigned to you.<br>Please review the ticket and update.".format(doc.reference_name, doc.description)
         }
@@ -124,9 +125,10 @@ def notify_user_about_closed_ticket(doc, method):
     if not doc.is_billing_mail_sent and doc.status == "Closed" and doc.billing_status == "Not Completed":
         doc.billing_status = "Billing"
         args = {
-            "email": doc.raised_by,
+            "email": [doc.raised_by, "sales@tanms.com"],
             "full_name": doc.customer_name or "Customer",
-            "subject": "Support Ticket is resolved and closed",
+            #"subject": "Support Ticket is resolved and closed",
+            "subject": doc.subject,
             "title": "Support Ticket updates",
             "msg": "Your Support ticket '{0} - {1}' is resolved and closed.<br>Kindly process the billing.".format(doc.name, doc.subject)
         }
